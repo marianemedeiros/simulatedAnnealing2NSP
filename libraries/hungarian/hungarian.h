@@ -42,7 +42,6 @@ typedef struct {
   int num_rows;
   int num_cols;
   int** cost;
-  int** m_assigment;
   int** assignment;
   int* assignment_vector;  
   int cost_solution;
@@ -53,7 +52,6 @@ typedef struct {
  *  It returns the size of the quadratic(!) assignment matrix. **/
 int hungarian_init(hungarian_problem_t* p, 
 		   int** cost_matrix, 
-		   int** cost_matrix2, 
 		   int rows, 
 		   int cols, 
 		   int mode);
@@ -62,7 +60,8 @@ int hungarian_init(hungarian_problem_t* p,
 void hungarian_free(hungarian_problem_t* p);
 
 /** This method computes the optimal assignment. **/
-void hungarian_solve(hungarian_problem_t* p, List** list, List* list_day, int* shift_per_nurse, int** cost_m);
+//void hungarian_solve(hungarian_problem_t* p, List** list, List* list_day, int* shift_per_nurse, int** cost_m);
+void hungarian_solve(hungarian_problem_t* part);
 
 /** Print the computed optimal assignment. **/
 void hungarian_print_assignment(hungarian_problem_t* p);

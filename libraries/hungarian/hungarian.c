@@ -40,7 +40,7 @@ void hungarian_print_matrix(int** C, int rows, int cols) {
   for(i=0; i<rows; i++) {
     fprintf(stderr, " [");
     for(j=0; j<cols; j++) {
-      fprintf(stderr, "%5d ",C[i][j]);
+      fprintf(stderr, "%3d ",C[i][j]);
     }
     fprintf(stderr, "]\n");
   }
@@ -69,7 +69,7 @@ int hungarian_imax(int a, int b) {
   return (a<b)?b:a;
 }
 
-int hungarian_init(hungarian_problem_t* p, int** cost_matrix, int** cost_matrix2, int rows, int cols, int mode) {
+int hungarian_init(hungarian_problem_t* p, int** cost_matrix, int rows, int cols, int mode) {
 
   int i,j, org_cols, org_rows;
   int max_cost;
@@ -91,9 +91,6 @@ int hungarian_init(hungarian_problem_t* p, int** cost_matrix, int** cost_matrix2
   p->cost = (int**)calloc(rows,sizeof(int*));
   hungarian_test_alloc(p->cost);
   
-  p->m_assigment = (int**)calloc(rows,sizeof(int*));
-  hungarian_test_alloc(p->m_assigment);
-
   p->assignment = (int**)calloc(rows,sizeof(int*));
   
   p->assignment_vector = (int*) calloc(cols,sizeof(int));
@@ -102,17 +99,14 @@ int hungarian_init(hungarian_problem_t* p, int** cost_matrix, int** cost_matrix2
 
   for(i=0; i<p->num_rows; i++) {
     p->cost[i] = (int*)calloc(cols,sizeof(int));
-    p->m_assigment [i] = (int*)calloc(cols,sizeof(int));
     
     hungarian_test_alloc(p->cost[i]);
-    hungarian_test_alloc(p->m_assigment[i]);
 
     p->assignment[i] = (int*)calloc(cols,sizeof(int));
     hungarian_test_alloc(p->assignment[i]);
     
     for(j=0; j<p->num_cols; j++) {
       p->cost[i][j] =  (i < org_rows && j < org_cols) ? cost_matrix[i][j] : 0;
-      p->m_assigment[i][j] =  (i < org_rows && j < org_cols) ? cost_matrix2[i][j] : 0;
       p->assignment[i][j] = 0;
       p->assignment_vector[i] = 0;
 
@@ -145,23 +139,21 @@ void hungarian_free(hungarian_problem_t* p) {
   int i;
   for(i=0; i<p->num_rows; i++) {
     free(p->cost[i]);
-    free(p->m_assigment[i]);
     free(p->assignment[i]);
   }
   free(p->cost);
-  free(p->m_assigment);
   free(p->assignment);
   free(p->assignment_vector);
 
   p->cost = NULL;
-  p->m_assigment = NULL;
   p->assignment = NULL;
   p->assignment_vector = NULL;
 }
 
 
 
-void hungarian_solve(hungarian_problem_t* p, List** list, List* list_day, int* shift_per_nurse, int** cost_m)
+//void hungarian_solve(hungarian_problem_t* p, List** list, List* list_day, int* shift_per_nurse, int** cost_m)
+void hungarian_solve(hungarian_problem_t* p)
 {
   int i, j, m, n, k, l, s, t, q, unmatched, cost;
   int* col_mate;
@@ -409,22 +401,23 @@ void hungarian_solve(hungarian_problem_t* p, List** list, List* list_day, int* s
   int c = 0;
   for (i=0;i<m;++i)
     {
-      printf("\nhungarian.c (412) : (turno atribuido: %d)\n i: %d, col_mate: %d \n (custo: %d)",p->m_assigment[i][col_mate[i]], i , col_mate[i], cost_m[i][col_mate[i]]);
-      c += cost_m[i][col_mate[i]];
+      //printf("\nhungarian.c (412) : (turno atribuido: %d)\n i: %d, col_mate: %d \n (custo: %d)",p->m_assigment[i][col_mate[i]], i , col_mate[i], cost_m[i][col_mate[i]]);
+      //c += cost_m[i][col_mate[i]];
 
       p->assignment[i][col_mate[i]]=HUNGARIAN_ASSIGNED;
-      p->assignment_vector[i] = p->m_assigment[i][col_mate[i]];
+      p->assignment_vector[i] = col_mate[i];
       
-      if(p->m_assigment[i][col_mate[i]] != 3)
-        shift_per_nurse[i]++;
+      //if(p->m_assigment[i][col_mate[i]] != 3)
+      //  shift_per_nurse[i]++;
 
-      addLastList(list[i], p->m_assigment[i][col_mate[i]]);
-      addLastList(list_day, p->m_assigment[i][col_mate[i]]);
+      //addLastList(list[i], p->m_assigment[i][col_mate[i]]);
+      //addLastList(list_day, p->m_assigment[i][col_mate[i]]);
+      
       //printf("matrix custo (%d,%d): %d\n", i, col_mate[i], p->m_assigment[i][col_mate[i]]);
       //p->cost_solution += p->m_cost[i][col_mate[i]];
       /*TRACE("%d - %d\n", i, col_mate[i]);*/
     }
-    printf("\n----------- cost solution: %d\n", c);
+    //printf("\n----------- cost solution: %d\n", c);
   for (k=0;k<m;++k)
     {
       for (l=0;l<n;++l)
