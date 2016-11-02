@@ -28,7 +28,7 @@ typedef struct{
 	List** nurse_per_day;
 	List** day_per_nurse;
 	int cost_solution;
-}Multipartite_Graph;
+}Schedule;
 
 /**
 * Show the content of an schedule.
@@ -36,7 +36,7 @@ typedef struct{
 * @param size1, is the size of nurse_per_day matrix.
 * @param size2, is the size of day_per_nurse matrix.
 */
-void show_multipartite_graph(Multipartite_Graph* m);
+void show_multipartite_graph(Schedule* m);
 
 /**
 * Verify number of assignments to a nurse. Check if this number it's between 
@@ -48,14 +48,6 @@ void show_multipartite_graph(Multipartite_Graph* m);
 * @return 1 if number of shifts is lower or higher than min and max values. Otherwise, returns 0.
 **/
 int verify_number_of_assigments(int shift_per_nurse, int* number_of_assigments);
-
-/**
-* Assigned a shift to a nurse.
-* 
-* @param shift_per_nurse, vector that save amount of shifts to a nurse.
-* @i, nurse.
-**/
-void att_shift2nurse(int* shift_per_nurse, int i);
 
 /*
  * Verify if have minimum number of nurses assigned to shift j.
@@ -88,15 +80,6 @@ void att_nurse2shift(int* vet, int shift);
 */
 int verify_shift(int shift, int previous_shift);
 
-/**
-* Get the number assigned to a shift. This function is used because, cost matrix have number of shifts equal number of nurses,
-* but, shift higher than max number of shifts are equal FREE shift.
-*
-* @param element, shift.
-*
-* @return number assigned to shift.
-*/
-int get_shift(int element);
 
 /**
 * This function verify number of consecutive shifts assigned to a nurse.
@@ -117,6 +100,4 @@ int verify_consecutive_assigments(int consecutive_assigments, int min, int max);
 *
 * @return a schedule.
 */
-Multipartite_Graph* build_cost_matrix(NspLib* nsp, Constraints* c);
-
-Multipartite_Graph* build_cost_matrix2(NspLib* nsp, Constraints* c);
+Schedule* build_cost_matrix(NspLib* nsp, Constraints* c);
