@@ -5,6 +5,7 @@
 #include<time.h>
 #include "libraries/assignment_problem.h"
 
+
  int n_nurses;
  int n_days;
  int n_shifts;
@@ -12,8 +13,8 @@
  static NspLib* nsp;
  static Constraints* c;
 
-int cost_solution(Multipartite_Graph* s){
-	int** same_assignments = (int**) calloc(n_nurses, sizeof(int*));// matrix de enfermeiros por turnos, 
+int cost_solution(Schedule* s){
+/**	int** same_assignments = (int**) calloc(n_nurses, sizeof(int*));// matrix de enfermeiros por turnos, 
 	//que será armazenado a quantidade de turnos atribuidos consecutivamente a um enfermeiro
 	int** nurse_per_shift_in_day = (int**) calloc(n_days, sizeof(int*));
 
@@ -80,12 +81,14 @@ int cost_solution(Multipartite_Graph* s){
 
 	printf("total_cost: %d\n", total_cost);
 	return total_cost;
+	**/
+	return NULL;
 }
 
 
 
 
-Multipartite_Graph* generate_neighbor(Multipartite_Graph* s){
+Schedule* generate_neighbor(Schedule* s){
 	time_t t;
 	srand((unsigned) time(&t));
 
@@ -105,8 +108,8 @@ Multipartite_Graph* generate_neighbor(Multipartite_Graph* s){
 	return s;
 }
 
-Multipartite_Graph* copy_solution(Multipartite_Graph* s){
-	Multipartite_Graph* rt = (Multipartite_Graph*) calloc(1,sizeof(Multipartite_Graph));
+Schedule* copy_solution(Schedule* s){
+	Schedule* rt = (Schedule*) calloc(1,sizeof(Schedule));
 	
 	List** nurse_per_day = (List**) calloc(n_nurses, sizeof(List*));
 	List** day_per_nurse = (List**) calloc(n_days, sizeof(List*));
@@ -136,14 +139,14 @@ double randomize(int delta_custo, int temperature){
 	return 0;
 }
 
-void simulated_annealing(Multipartite_Graph* initial_s, int t0, int tf, int n_it, double ro){
-	Multipartite_Graph* current_s = initial_s;
-	Multipartite_Graph* best_s = initial_s;
+void simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, double ro){
+	Schedule* current_s = initial_s;
+	Schedule* best_s = initial_s;
 	int t = t0;
 
 	while(t > tf){
 		for (int i = 0; i < n_it; i++){
-			Multipartite_Graph* s_line = copy_solution(current_s);
+			Schedule* s_line = copy_solution(current_s);
 			s_line = generate_neighbor(s_line);
 			s_line->cost_solution = cost_solution(s_line);
 
@@ -168,13 +171,11 @@ int main(){
 	n_days = nsp->problem_size[1];
 	n_shifts = nsp->problem_size[2];
 
-	Multipartite_Graph *m =  build_cost_matrix2(nsp, c);
-	//m->cost_solution = 
-	cost_solution(m);
+	Schedule *m =  build_cost_matrix(nsp, c);
 
 	//simulated_annealing(m,1,1,1,0.8);
 	
-	show_multipartite_graph(m);
+	//show_multipartite_graph(m);
 	//showNsp(nsp);
 	//showConstraints(c);
 
