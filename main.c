@@ -9,80 +9,102 @@
  int n_nurses;
  int n_days;
  int n_shifts;
+ int** matrix_preference;
 
  static NspLib* nsp;
  static Constraints* c;
 
+int** shifts_per_day(List** day_per_nurse){
+	int** rt = (int**) calloc(n_days, sizeof(int*));
+	
+	for (int d = 0; d < n_days; d++){
+		rt[d] = (int*) calloc(n_shifts, sizeof(int));
+		List* nurses = day_per_nurse[d];
+		Node* e = nurses->first;
+
+		while(e != NULL){
+			if(e->data == MORNING)
+				rt[d][MORNING]++;
+			if(e->data == EVENING)
+				rt[d][EVENING]++;
+			if(e->data == NIGHT)
+				rt[d][NIGHT]++;
+			if(e->data == FREE)
+				rt[d][FREE]++;
+			e = e->next;	
+		}
+	}
+	return rt;
+}
+
+int* shifts_per_nurse(List** nurse_per_day){
+	int	*rt = (int*) calloc(n_nurses, sizeof(int));
+
+	for (int i = 0; i < n_nurses; i++){
+		Node* aux = nurse_per_day[i]->first;
+		while(aux != NULL){
+			if(aux->data != FREE)
+				rt[i]++;
+			aux = aux->next;
+		}
+	}
+	return rt;
+}
+
+//nurse_per_day - dia esta na coluna
+//day_per_nurse - nurse esta na coluna 
 int cost_solution(Schedule* s){
-/**	int** same_assignments = (int**) calloc(n_nurses, sizeof(int*));// matrix de enfermeiros por turnos, 
-	//que será armazenado a quantidade de turnos atribuidos consecutivamente a um enfermeiro
-	int** nurse_per_shift_in_day = (int**) calloc(n_days, sizeof(int*));
+	int** minimum_coverage = shifts_per_day(s->day_per_nurse);
+	int** same_assignments = (int**) calloc(n_nurses, sizeof(int*));
+	int* shift_per_nurse = shifts_per_nurse(s->nurse_per_day);
 
 	int total_cost = 0;
-	//percorrer a lista de nurse por dia.
-	for (int n = 0; n < n_nurses; n++){
-		int* shift_per_nurse = (int*) calloc(n_nurses, sizeof(int));
-		List* days = s->nurse_per_day[n];
-		Node* s = days->first;
-		
-		printf("Nurse %d - ", n);
-		printList(days);
-		printf("\n");
-		for (int d = 0; d < days->size; d++){
-			nurse_per_shift_in_day[d] = (int*) calloc(n_shifts, sizeof(int));
-
-			if(d == 0 )
-				same_assignments[n] = (int*) calloc(n_shifts,sizeof(int));
-			
+	
+	for (int d = 0; d < n_days; d++){
+		List* day_schedule = s->day_per_nurse[d];
+		Node* nurse = day_schedule->first;
+		int index_n = 0; int r = 0, r1 = 0, cost = 0;
+		while(nurse != NULL){
+			if(d == 0)
+				same_assignments[index_n] = (int*) calloc(n_shifts, sizeof(int));
 
 			int nHCV = 0, nSCV = 0;
-			int shift = s->data;
-			Node* next = s->next;
 
-			if(next != NULL){
-				int next_shift = next->data;
-				if(verify_shift(next_shift,shift) == 1)
+			//verify next shift
+			if(d != (n_days-1)){
+				int next_shift = getElementByIndex(s->day_per_nurse[d+1],index_n);
+				
+				if(verify_shift(next_shift,nurse->data) == 1)
 					nHCV++;
-
-				if(shift == next_shift)
-					same_assignments[n][shift]++;
+				
+				if(nurse->data == next_shift)
+						same_assignments[index_n][nurse->data]++;
 			}
 
-			if(shift != FREE)
-				att_shift2nurse(shift_per_nurse,n);
-			
-			att_nurse2shift(nurse_per_shift_in_day[d],shift);
-			total_cost += nsp->preference_matrix[n][(d*n_shifts)+shift] + (Ph*nHCV);
+			if(verify_consecutive_assigments(same_assignments[index_n][nurse->data], c->consecutive_assigments_matrix[nurse->data][0], c->consecutive_assigments_matrix[nurse->data][1]) == 1)
+				nHCV++;							
 
-			s = s->next;
-		}
+			//percorre o vetor verificando quantos turnos tem a nurse e depois verifica se a qntd quebra a regra ou nao
+			if (verify_number_of_assigments(shift_per_nurse[index_n], c->number_of_assigments) == 1)
+				nHCV++;
 
-		int nHCV = 0, nSCV = 0;
-		for (int k = 0; k < n_shifts; k++){
-			for (int d = 0; d < n_days; d++){
-				if(verify_minimum_coverage(d, nsp->coverage_matrix, k, nurse_per_shift_in_day[d][k]))
+			if(verify_minimum_coverage(d, nsp->coverage_matrix, nurse->data, minimum_coverage[d][nurse->data]))
 				nSCV++;
-			}
-			
-			if(verify_consecutive_assigments(same_assignments[n][k], c->consecutive_assigments_matrix[k][0], c->consecutive_assigments_matrix[k][1]) == 1)
-				nHCV++;	
-			
-		}		
+			r = nHCV;
+			r1 = nSCV;
 
-		if (verify_number_of_assigments(shift_per_nurse[n], c->number_of_assigments) == 1)
-			nHCV++;
+			if(nHCV != 0 || nSCV != 0)
+				cost = matrix_preference[index_n][(d*n_shifts)+nurse->data] + Ph * nHCV + Ps * nSCV;
 
-		total_cost += (Ph*nHCV) + (Ps*nSCV);
+			index_n++;
+			nurse = nurse->next;
+		}
+					total_cost+= cost;
 
-		free(shift_per_nurse);
-		free(same_assignments[n]);
+		//printf("day: %d; cost: %d (nHCV: %d; nSCV: %d)\n", d, cost, r, r1);
 	}
-	free(same_assignments);
-
-	printf("total_cost: %d\n", total_cost);
+	//printf("Total cost: %d\n", total_cost);
 	return total_cost;
-	**/
-	return NULL;
 }
 
 
@@ -139,7 +161,8 @@ double randomize(int delta_custo, int temperature){
 	return 0;
 }
 
-void simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, double ro){
+Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, double ro){
+	printf("Initial temperature: %d; Final temperature: %d; Iterations: %d\n", t0,tf, n_it);
 	Schedule* current_s = initial_s;
 	Schedule* best_s = initial_s;
 	int t = t0;
@@ -154,27 +177,32 @@ void simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, double r
 			if(delta_custo <= 0 || randomize(delta_custo,t) == 1)
 				current_s = s_line;
 		
-			if(current_s->cost_solution < best_s->cost_solution)
+			if(current_s->cost_solution < best_s->cost_solution){
 				best_s = current_s;
-		}		
+				printf("Cost: %d\n", best_s->cost_solution);
+			}
+		}	
 	//reduz a temperatura
 		t = ro * t; // fator de redução. TODO ver outras formas
 	}
-
+	return best_s;
 }
 
 int main(){
 	nsp =  readNspFile((char*)"/home/mariane/Dropbox/mestrado/MHOC/trabalho_implementacao/semDlib/files/7290.nsp");
 	c = readConstrainstsFile((char*)"/home/mariane/Dropbox/mestrado/MHOC/trabalho_implementacao/semDlib/files/casos-1-8/1.gen");	
 	
+	matrix_preference = nsp->preference_matrix;
 	n_nurses = nsp->problem_size[0];
 	n_days = nsp->problem_size[1];
 	n_shifts = nsp->problem_size[2];
 
 	Schedule *m =  build_cost_matrix(nsp, c);
+	m->cost_solution = cost_solution(m);
+	printf("Initial Cost: %d\n", m->cost_solution);
 
-	//simulated_annealing(m,1,1,1,0.8);
-	
+	Schedule *rt = simulated_annealing(m,10000,1,10000,0.9);
+	show_multipartite_graph(rt);
 	//show_multipartite_graph(m);
 	//showNsp(nsp);
 	//showConstraints(c);
