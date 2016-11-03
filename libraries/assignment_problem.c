@@ -6,10 +6,10 @@ void show_multipartite_graph(Schedule* m){
 		printList(m->day_per_nurse[i]);
 	}
 
-	for (int i = 0; i < n_nurses; i++){
-		printf("\nNurse %d 	", i);
-		printList(m->nurse_per_day[i]);
-	}
+	//for (int i = 0; i < n_nurses; i++){
+	//	printf("\nNurse %d 	", i);
+	//	printList(m->nurse_per_day[i]);
+	//}
 }
 
 void print_cost_m(int** m_cost, int** m_assigment){
@@ -142,8 +142,10 @@ int verify_number_of_assigments(int shift_per_nurse, int* number_of_assigments){
 }
 
 int verify_minimum_coverage(int day, int** coverage_matrix, int shift, int nurse_shift){
-	if(shift <= FREE && nurse_shift < coverage_matrix[day][shift])
+	if(nurse_shift < coverage_matrix[day][shift]){
+		printf("nurser_per_shift: %d \n", nurse_shift);
 		return 1;
+	}
 	else
 		return 0;
 }
@@ -218,13 +220,19 @@ Schedule* build_cost_matrix(NspLib* nsp, Constraints* c){
 						//printf("H2: Dia %d - Nurse %d quebrou restrição H2. (i:%d) (j:%d)\n",d, i, i,j);
 					}
 
+					if(m_assigment[i][j] != FREE)
+						shift_per_nurse[i]++;
+
 					if (verify_number_of_assigments(shift_per_nurse[i], c->number_of_assigments) == 1)
 						nHCV++;
+
+					if(m_assigment[i][j] != FREE)
+						shift_per_nurse[i]--;
 
 					if(verify_minimum_coverage(d, nsp->coverage_matrix, m_assigment[i][j], nurses_per_shift[m_assigment[i][j]]))
 						nSCV++;
 
-					if(nHCV != 0)
+					if(nHCV != 0 || nSCV != 0)
 						m_cost[i][j] += Ph * nHCV + Ps * nSCV;
 				}
 
@@ -244,7 +252,8 @@ Schedule* build_cost_matrix(NspLib* nsp, Constraints* c){
 
 		printf("Dia %d - ", d);
 		printList(day_per_nurse[d]);
-		printf(" - cost %d \n", c);
+		printf("\n");
+		//printf(" - cost %d \n", c);
 		//print_cost_m(m_cost, m_assigment);
 		schedule_cost += c;
 		
@@ -262,7 +271,7 @@ Schedule* build_cost_matrix(NspLib* nsp, Constraints* c){
 	}
 
 	free(shift_per_nurse);
-	printf("Schedule cost: %d\n", schedule_cost);
+	//printf("Schedule cost: %d\n", schedule_cost);
 	
 	s->nurse_per_day = nurse_per_day;
 	s->day_per_nurse = day_per_nurse;
