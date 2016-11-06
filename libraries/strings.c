@@ -14,12 +14,14 @@
  * @returns char converted to int.
  */
 int strncopy(char* line, int from, int to){
-	char* t = (char*) malloc((to-from) * sizeof(char));
+	char* t = (char*) malloc((to-from)+1 * sizeof(char));
 	for (int i = 0; i <= (to - from)+1; i++){
 		t[i] = line[from];
 		from++;
 	}
-	return atoi(t);
+	int r = atoi(t);
+	free(t);
+	return r;
 }
 
 /**

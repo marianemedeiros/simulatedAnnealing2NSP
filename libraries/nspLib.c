@@ -3,6 +3,10 @@
 #include<string.h>
 #include "strings.h"
 
+extern int n_nurses;
+extern int n_days;
+extern int n_shifts;
+
 typedef struct constraints{
 	int *problem_size;
 	int *number_of_assigments;
@@ -16,6 +20,21 @@ typedef struct nspLib{
 	int **preference_matrix; // alocar dinamicamente de acordo com a quantidade de enfermeiros(linhas) x (numero de dias*qnt de turnos) (colunas)
 }NspLib;
 
+
+void freeNsp(NspLib* nsp){
+	free(nsp->problem_size);
+
+	for (int i = 0; i < n_days; i++){
+		free(nsp->coverage_matrix[i]);
+	}
+	//free(nsp->coverage_matrix);
+
+	for (int i = 0; i < (n_days*n_shifts); i++){
+		free(nsp->preference_matrix[i]);
+	}
+	//free(nsp->preference_matrix);
+}
+
 void showVector(int *v){
 	for (int i = 0; i < 4; ++i){
 		printf("%d ", *(v+i));
@@ -28,8 +47,7 @@ void readLine(char* line, int* vector){
 	
 	for (int i = 0; i < strlen(line); i++){
 		if(line[i] == TAB){
-			int r = strncopy(line,j,i);
-			vector[x] = r;
+			vector[x] = strncopy(line,j,i);
 			x++;
 			s = i;
 			j = i + 1;
@@ -37,10 +55,8 @@ void readLine(char* line, int* vector){
 	}
 
 	//copy from the last (space + 1) until the last charecter
-	int r = strncopy(line,s+1,strlen(line)-1);
-	vector[x] = r;
+	vector[x] = strncopy(line,s+1,strlen(line)-1);
 	x++;
-
 //	return vector;
 }
 
@@ -51,7 +67,7 @@ int index_c_m = 0; // index coverage matrix
 int index_p_m = 0; // index preference matrix
 
 FILE* arq = fopen(url,"rt");
-char line[1000];
+char* line = (char*) calloc(1000, sizeof(char));
 int n_line = 0;
 	if(!arq){
 	     perror("Can't open file.");
@@ -80,14 +96,13 @@ int n_line = 0;
 				readLine(line, nsp->preference_matrix[index_p_m]);
 				index_p_m++;
 			}
-
    			n_line++;
 		}
 
 	    fclose(arq);
-		printf("Success read nsp file!\n\n");
+		//printf("Success read nsp file!\n\n");
      }
-
+     free(line);
      return nsp;
 }
 
@@ -141,7 +156,7 @@ Constraints *c = (Constraints*) calloc(1, sizeof(Constraints));
 
 
 	    fclose(arq);
-	    printf("Success read constraints file!\n\n");
+	    //printf("Success read constraints file!\n\n");
 	    return c;
      }
 }

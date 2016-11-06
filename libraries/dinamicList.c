@@ -50,18 +50,17 @@ List* initializeList(){
  *
  */
 void addLastList(List* list, ItemType element){
-	Node* newNode;
-	newNode = (Node*) calloc(1,sizeof(Node));
-	newNode->data = element;
 	if(list->first == NULL && list->last == NULL){
-		list->first = newNode;
-		list->last = newNode;
+		list->first = (Node*) calloc(1,sizeof(Node));
+		list->first->data = element;
+		list->last = list->first;
 		list->last->next = NULL;
 		list->size++;
 	}
 	else{
-		list->last->next = newNode;
-		list->last = newNode;
+		list->last->next = (Node*) calloc(1,sizeof(Node));
+		list->last->next->data = element;
+		list->last = list->last->next;
 		list->last->next == NULL;
 		list->size++;		
 	}
