@@ -298,22 +298,24 @@ void readDir(){
 int main(){
 	//readDir();
 	
-	NspLib* nsp =  readNspFile((char*)"/home/mariane/Documents/simulatedAnnealing2NSP/files/7290.nsp");
-	Constraints* c = readConstrainstsFile((char*)"/home/mariane/Documents/simulatedAnnealing2NSP/files/casos-1-8/1.gen");	
+	NspLib* nsp =  readNspFile((char*)"/home/mariane/Downloads/simulatedAnnealing2NSP/files/teste/1.nsp");
+	Constraints* c = readConstrainstsFile((char*)"/home/mariane/Downloads/simulatedAnnealing2NSP/files/casos-1-8/1.gen");	
 	
 
-	Schedule *m =  build_cost_matrix(nsp, c);
-	m->cost_solution = cost_solution(m, c, nsp);
-	printf("Initial Cost: %d\n", m->cost_solution);
+	//Schedule *m =  build_cost_matrix(nsp, c);
+	//m->cost_solution = cost_solution(m, c, nsp);
+	//printf("Initial Cost: %d\n", m->cost_solution);
 	
-	Schedule *rt = simulated_annealing(m,10000,1,1000,0.8,1, c, nsp);	
-	show_multipartite_graph(rt);
+	//Schedule *rt = simulated_annealing(m,1000,1,100,0.75,1, c, nsp);	
+	//show_multipartite_graph(rt);
 
 	
 	//show_multipartite_graph(m);
 	//showNsp(nsp);
 	//showConstraints(c);
 
-	//free(nsp);
-	//free(c);
+	freeNsp(nsp);
+	free(nsp);
+	freeConstraints(c);
+	free(c);
 }
