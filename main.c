@@ -215,26 +215,29 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 			s_line->cost_solution = cost_solution(s_line, c, nsp);
 			int delta_custo = 0;
 			
+
 			if(use_vnd == 1){
-				Schedule* s_2line = vnd(s_line, 10,c,nsp);
+				//printf("depois do if\n");
+				Schedule* s_2line = vnd(s_line, 1000,c,nsp);
 				delta_custo = s_2line->cost_solution - current_s->cost_solution;
 				free_schedule(s_2line);
 			}else{
 				delta_custo = s_line->cost_solution - current_s->cost_solution;
 			}
 
-
 			if(delta_custo < 0 || randomize(delta_custo,t) == 1){
 				free_schedule(current_s);
-				current_s = (Schedule*) calloc(1, sizeof(Schedule));
-				current_s = s_line;
+				//current_s = (Schedule*) calloc(1, sizeof(Schedule));
+				current_s = copy_solution(s_line);
+
 			}
 				
 			if(current_s->cost_solution < best_s->cost_solution){
+//				printf("free best:::: %d\n", best_s->cost_solution);
 				free_schedule(best_s);
-				best_s = (Schedule*) calloc(1, sizeof(Schedule));
-				best_s = current_s;
-
+				//best_s = (Schedule*) calloc(1, sizeof(Schedule));
+				best_s = copy_solution(current_s);
+				
 				printf("-- Cost: %d (it: %d, t: %d)\n", best_s->cost_solution, i, t);
 				//show_multipartite_graph(best_s);
 			}
@@ -295,15 +298,15 @@ void readDir(){
 int main(){
 	//readDir();
 	
-	NspLib* nsp =  readNspFile((char*)"/home/mariane/Dropbox/mestrado/MHOC/trabalho_implementacao/semDlib/files/7290.nsp");
-	Constraints* c = readConstrainstsFile((char*)"/home/mariane/Dropbox/mestrado/MHOC/trabalho_implementacao/semDlib/files/casos-1-8/1.gen");	
+	NspLib* nsp =  readNspFile((char*)"/home/mariane/Documents/simulatedAnnealing2NSP/files/7290.nsp");
+	Constraints* c = readConstrainstsFile((char*)"/home/mariane/Documents/simulatedAnnealing2NSP/files/casos-1-8/1.gen");	
 	
 
 	Schedule *m =  build_cost_matrix(nsp, c);
 	m->cost_solution = cost_solution(m, c, nsp);
 	printf("Initial Cost: %d\n", m->cost_solution);
 	
-	Schedule *rt = simulated_annealing(m,10000,1,10000,0.8,1, c, nsp);	
+	Schedule *rt = simulated_annealing(m,10000,1,1000,0.8,1, c, nsp);	
 	show_multipartite_graph(rt);
 
 	
