@@ -298,8 +298,8 @@ void readDir(){
 int main(){
 	//readDir();
 	
-	NspLib* nsp =  readNspFile((char*)"/home/mariane/Downloads/simulatedAnnealing2NSP/files/teste/1.nsp");
-	Constraints* c = readConstrainstsFile((char*)"/home/mariane/Downloads/simulatedAnnealing2NSP/files/casos-1-8/1.gen");	
+	NspLib* nsp =  readNspFile((char*)"files/7290.nsp");
+	Constraints* c = readConstrainstsFile((char*)"files/casos-1-8/1.gen");	
 	
 
 	//Schedule *m =  build_cost_matrix(nsp, c);
