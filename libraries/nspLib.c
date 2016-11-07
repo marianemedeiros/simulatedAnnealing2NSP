@@ -20,6 +20,16 @@ typedef struct nspLib{
 	int **preference_matrix; // alocar dinamicamente de acordo com a quantidade de enfermeiros(linhas) x (numero de dias*qnt de turnos) (colunas)
 }NspLib;
 
+void freeConstraints(Constraints* c){
+	free(c->problem_size);
+	free(c->number_of_assigments);
+	free(c->consecutive_working_shifts);
+
+	for (int i = 0; i < n_shifts; i++){
+		free(c->consecutive_assigments_matrix[i]);
+	}
+	free(c->consecutive_assigments_matrix);
+}
 
 void freeNsp(NspLib* nsp){
 	free(nsp->problem_size);

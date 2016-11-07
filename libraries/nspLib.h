@@ -24,3 +24,4 @@ Constraints* readConstrainstsFile(char* url);
 void showConstraints(Constraints* c);
 void showNsp(NspLib* nsp);
 void freeNsp(NspLib* nsp);
+void freeConstraints(Constraints* c);
