@@ -250,6 +250,8 @@ Schedule* build_cost_matrix(NspLib* nsp, Constraints* c){
 		schedule_day = (int*) calloc(n_nurses, sizeof(int));
 		int c = combine_schedule(shift_per_nurse, m_cost, p->assignment_vector, m_assigment, nurse_per_day, day_per_nurse, d, schedule_day);
 
+		hungarian_free(p);
+		
 		printf("Dia %d - ", d);
 		printList(day_per_nurse[d]);
 		printf("\n");
