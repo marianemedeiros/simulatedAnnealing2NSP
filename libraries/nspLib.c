@@ -37,12 +37,12 @@ void freeNsp(NspLib* nsp){
 	for (int i = 0; i < n_days; i++){
 		free(nsp->coverage_matrix[i]);
 	}
-	free(nsp->coverage_matrix);
+	//free(nsp->coverage_matrix);
 
 	for (int i = 0; i < (n_days*n_shifts); i++){
 		free(nsp->preference_matrix[i]);
 	}
-	free(nsp->preference_matrix);
+	//free(nsp->preference_matrix);
 }
 
 void showVector(int *v){
