@@ -28,6 +28,7 @@ typedef struct{
 	int size;
 }List;
 
+
 /**
  * create and inicialize structure.
  *
@@ -359,4 +360,12 @@ List* copyList(List* list, List* newList){
 		newNode = newNode->next;
 	}
 	return newList;
+}
+
+void freeList(List* list){
+	Node* node = list->first;
+	while(node != NULL){
+		free(node);
+		node = node->next;
+	}
 }

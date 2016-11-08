@@ -43,3 +43,4 @@ int isEmptyList(List* list);
 void printList(List* list);
 List* copyList(List* list, List* newList);
 ItemType getElementByIndex(List* list, int index);
+void freeList(List* list);
