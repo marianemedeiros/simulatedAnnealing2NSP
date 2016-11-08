@@ -338,16 +338,16 @@ int main(){
 	
 	NspLib* nsp =  readNspFile((char*)"files/7290.nsp");
 	
-	Schedule *m =  build_cost_matrix(nsp, c1);
-	m->cost_solution = cost_solution(m, c1, nsp);
+	//Schedule *m =  build_cost_matrix(nsp, c1);
+	//m->cost_solution = cost_solution(m, c1, nsp);
 	//printf("Initial Cost: %d\n", m->cost_solution);
 	
-	Schedule *rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//Schedule *rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
 	//show_multipartite_graph(rt);
-	char name[21] = "resultados/7290.txt";
-	char name1[2] = "1";
-	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
-	free_schedule(rt);
+	//char name[21] = "resultados/7290.txt";
+	//char name1[2] = "1";
+	//saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	//free_schedule(rt);
 	
 	/*
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
@@ -398,11 +398,11 @@ int main(){
 	//showConstraints(c);
 
 	
-	free_schedule(m);
+	//free_schedule(m);
 	
 
-	freeNsp(nsp);
-	free(nsp);
+	//freeNsp(nsp);
+	//free(nsp);
 	
 	freeConstraints(c1);
 	free(c1);
