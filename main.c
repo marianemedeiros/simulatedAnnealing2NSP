@@ -6,19 +6,21 @@
 #include <dirent.h> 
 #include "libraries/assignment_problem.h"
 
-#define PERMUTATIONS 1
-
+#define PERMUTATIONS 5
+#define K 1000
  int n_nurses = 25;
  int n_days = 7;
  int n_shifts = 4;
  
 void free_schedule(Schedule* s){
 	for (int i = 0; i < n_days; i++){
+		freeList(s->day_per_nurse[i]);
 		free(s->day_per_nurse[i]);
 	}
 	free(s->day_per_nurse);
 
 	for (int i = 0; i < n_nurses; i++){
+		freeList(s->nurse_per_day[i]);
 		free(s->nurse_per_day[i]);
 	}
 	free(s->nurse_per_day);
@@ -203,7 +205,7 @@ Schedule* vnd(Schedule* s, int neighbor_struct, Constraints* c, NspLib* nsp){
 }
 
 Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, double ro, int use_vnd, Constraints* c, NspLib* nsp){
-	printf("Initial temperature: %d; Final temperature: %d; Iterations: %d, VND: %d\n", t0,tf, n_it, use_vnd);
+	printf("Initial temperature: %d; Final temperature: %d; Iterations: %d, VND: %d, Vizinhança do VND: %d\n", t0,tf, n_it, use_vnd, K);
 	Schedule* current_s = copy_solution(initial_s);
 	Schedule* best_s = copy_solution(initial_s);;
 	int t = t0;
@@ -218,7 +220,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 
 			if(use_vnd == 1){
 				//printf("depois do if\n");
-				Schedule* s_2line = vnd(s_line, 1000,c,nsp);
+				Schedule* s_2line = vnd(s_line, K ,c,nsp);
 				delta_custo = s_2line->cost_solution - current_s->cost_solution;
 				free_schedule(s_2line);
 			}else{
@@ -294,28 +296,129 @@ void readDir(){
   	}
 }
 
+void saveSchedule(char* name, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s){
+   FILE *fp;
+
+   fp = fopen(name, "a+");
+
+   if(fp == NULL)
+   	printf("nao abriu\n");
+
+   fprintf(fp, "\nConstraints File: %s; Temperature: %d, Final Temp: %d, Iterations: %d, Reduction Rate: %f, VNS: %d, K: %d\n", constraint, temp, finalTemp, it, reduction, vns, K);
+
+	for (int i = 0; i < n_days; i++){
+		fprintf(fp, "Day %d 	", i);
+		Node* node = s->day_per_nurse[i]->first;
+		while(node != NULL){
+			fprintf(fp, "%d ", node->data);
+			node = node->next;
+		}
+		fprintf(fp, "\n");
+	}
+	fprintf(fp, "Final cost: %d ", s->cost_solution);
+   	fclose(fp);
+}
 
 int main(){
+	int temp = 10000;
+	int finalTemp = 1;
+	int it = 100;
+	double reduction = 0.75;
+	int vns = 1;
+
+	Constraints* c1 = readConstrainstsFile((char*)"files/casos-1-8/1.gen");
+	Constraints* c2 = readConstrainstsFile((char*)"files/casos-1-8/2.gen");
+	Constraints* c3 = readConstrainstsFile((char*)"files/casos-1-8/3.gen");
+	Constraints* c4 = readConstrainstsFile((char*)"files/casos-1-8/4.gen");
+	Constraints* c5 = readConstrainstsFile((char*)"files/casos-1-8/5.gen");
+	Constraints* c6 = readConstrainstsFile((char*)"files/casos-1-8/6.gen");
+	Constraints* c7 = readConstrainstsFile((char*)"files/casos-1-8/7.gen");
+	Constraints* c8 = readConstrainstsFile((char*)"files/casos-1-8/8.gen");
 	//readDir();
 	
 	NspLib* nsp =  readNspFile((char*)"files/7290.nsp");
-	Constraints* c = readConstrainstsFile((char*)"files/casos-1-8/1.gen");	
 	
-
-	//Schedule *m =  build_cost_matrix(nsp, c);
-	//m->cost_solution = cost_solution(m, c, nsp);
+	Schedule *m =  build_cost_matrix(nsp, c1);
+	m->cost_solution = cost_solution(m, c1, nsp);
 	//printf("Initial Cost: %d\n", m->cost_solution);
 	
-	//Schedule *rt = simulated_annealing(m,1000,1,100,0.75,1, c, nsp);	
+	Schedule *rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
 	//show_multipartite_graph(rt);
-
+	char name[21] = "resultados/7290.txt";
+	char name1[2] = "1";
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
 	
+	/*
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '2';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '3';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '4';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '5';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '6';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '7';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+
+	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	//show_multipartite_graph(rt);
+	name1[0] = '8';
+	saveSchedule(name, name1, temp,finalTemp,it,reduction,vns,rt);
+	free_schedule(rt);
+	*/
+
 	//show_multipartite_graph(m);
 	//showNsp(nsp);
 	//showConstraints(c);
 
+	
+	free_schedule(m);
+	
+
 	freeNsp(nsp);
 	free(nsp);
-	freeConstraints(c);
-	free(c);
+	
+	freeConstraints(c1);
+	free(c1);
+	freeConstraints(c2);
+	free(c2);
+	freeConstraints(c3);
+	free(c3);
+	freeConstraints(c4);
+	free(c4);
+	freeConstraints(c5);
+	free(c5);
+	freeConstraints(c6);
+	free(c6);
+	freeConstraints(c7);
+	free(c7);
+	freeConstraints(c8);
+	free(c8);
+
 }
