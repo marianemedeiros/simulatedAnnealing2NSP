@@ -3,7 +3,7 @@
 #include<string.h>
 
 #define TAB 9 
-
+#define ENTER 13
 /**
  * Copy a substring from 'de' until 'para'.
  *
@@ -16,8 +16,10 @@
 int strncopy(char* line, int from, int to){
 	char* t = (char*) malloc((to-from)+1 * sizeof(char));
 	for (int i = 0; i <= (to - from)+1; i++){
-		t[i] = line[from];
-		from++;
+		if(line[from] != '\0' && line[from] != TAB && line[from] != ENTER){
+			t[i] = line[from];
+			from++;
+		}
 	}
 	int r = atoi(t);
 	free(t);

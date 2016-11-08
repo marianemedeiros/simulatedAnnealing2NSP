@@ -87,22 +87,22 @@ int n_line = 0;
 			fgets(line, 255, arq);
 
 			if(n_line == 0){ // first line. (problem size matix)
-				nsp->problem_size = (int*) calloc(3, sizeof(int));
+				nsp->problem_size = (int*) calloc(4, sizeof(int));
 				readLine(line, nsp->problem_size);
 
-				nsp->preference_matrix = (int**) calloc(nsp->problem_size[0],sizeof(int*));
-				nsp->coverage_matrix = (int**) calloc(nsp->problem_size[1],sizeof(int*));
+				nsp->preference_matrix = (int**) calloc(nsp->problem_size[0]+1,sizeof(int*));
+				nsp->coverage_matrix = (int**) calloc(nsp->problem_size[1]+1,sizeof(int*));
 			}
 
 			if(n_line >= 2 && n_line <= nsp->problem_size[1]+1){// coverage matrix
-				nsp->coverage_matrix[index_c_m] = (int*) calloc(nsp->problem_size[2], sizeof(int));
+				nsp->coverage_matrix[index_c_m] = (int*) calloc(nsp->problem_size[2]+1, sizeof(int));
 				readLine(line, nsp->coverage_matrix[index_c_m]);
 				index_c_m++;
 			}
 			
 
 			if(n_line >= (nsp->problem_size[1]+3)){
-				nsp->preference_matrix[index_p_m] = (int*) calloc((nsp->problem_size[1]*nsp->problem_size[2]), sizeof(int));
+				nsp->preference_matrix[index_p_m] = (int*) calloc(( (nsp->problem_size[1]*nsp->problem_size[2])+1), sizeof(int));
 				readLine(line, nsp->preference_matrix[index_p_m]);
 				index_p_m++;
 			}
@@ -131,27 +131,27 @@ Constraints *c = (Constraints*) calloc(1, sizeof(Constraints));
 			fgets(line, 255, arq);
 			
 			if(n_line == 0){ // problem size
-				c->problem_size = (int*) calloc(2,sizeof(int));
+				c->problem_size = (int*) calloc(3,sizeof(int));
 				c->problem_size[0] = strncopy(line,0,0);
 				c->problem_size[1] = strncopy(line,2,2);
 				
-				c->consecutive_assigments_matrix = (int**) calloc(c->problem_size[1],sizeof(int*));
+				c->consecutive_assigments_matrix = (int**) calloc(c->problem_size[1]+1,sizeof(int*));
 			}
 
 			if(n_line == 2){ // number of assigments (min and max)
-				c->number_of_assigments = (int*) calloc(2,sizeof(int));
+				c->number_of_assigments = (int*) calloc(3,sizeof(int));
 				c->number_of_assigments[0] = strncopy(line,0,0);
 				c->number_of_assigments[1] = strncopy(line,2,2);
 			}
 
 			if(n_line == 4){ // consecutive working shifts (min nd max)
-				c->consecutive_working_shifts = (int*) calloc(2,sizeof(int));
+				c->consecutive_working_shifts = (int*) calloc(3,sizeof(int));
 				c->consecutive_working_shifts[0] = strncopy(line,0,0);
 				c->consecutive_working_shifts[1] = strncopy(line,2,2);
 			}
 
 			if(n_line >= 6 && n_line < (6+c->problem_size[1])){ 
-				c->consecutive_assigments_matrix[index_ca_m] = (int*) calloc(4, sizeof(int));
+				c->consecutive_assigments_matrix[index_ca_m] = (int*) calloc(5, sizeof(int));
 				//readLine(line, c->consecutive_assigments_matrix[index_ca_m]);
 				c->consecutive_assigments_matrix[index_ca_m][0] = strncopy(line,0,0);
 				c->consecutive_assigments_matrix[index_ca_m][1] = strncopy(line,2,2);
@@ -203,6 +203,3 @@ void showNsp(NspLib* nsp){
 		printf("\n");
 	}
 }
-
-
-
