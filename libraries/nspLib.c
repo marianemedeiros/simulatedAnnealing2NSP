@@ -90,11 +90,13 @@ int n_line = 0;
 			fgets(line, 255, arq);
 
 			if(n_line == 0){ // first line. (problem size matix)
+
 				nsp->problem_size = (int*) calloc(4, sizeof(int));
 				readLine(line, nsp->problem_size);
 
 				nsp->preference_matrix = (int**) calloc(nsp->problem_size[0]+1,sizeof(int*));
 				nsp->coverage_matrix = (int**) calloc(nsp->problem_size[1]+1,sizeof(int*));
+
 			}
 
 			if(n_line >= 2 && n_line <= nsp->problem_size[1]+1){// coverage matrix
