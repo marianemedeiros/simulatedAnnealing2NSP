@@ -29,6 +29,7 @@ void freeConstraints(Constraints* c){
 		free(c->consecutive_assigments_matrix[i]);
 	}
 	free(c->consecutive_assigments_matrix);
+	free(c);
 }
 
 void freeNsp(NspLib* nsp){
@@ -37,12 +38,14 @@ void freeNsp(NspLib* nsp){
 	for (int i = 0; i < n_days; i++){
 		free(nsp->coverage_matrix[i]);
 	}
-	//free(nsp->coverage_matrix);
-
-	for (int i = 0; i < (n_days*n_shifts); i++){
+	free(nsp->coverage_matrix);
+	
+	for (int i = 0; i <= n_nurses; i++){
 		free(nsp->preference_matrix[i]);
 	}
-	//free(nsp->preference_matrix);
+	free(nsp->preference_matrix);
+	
+	free(nsp);
 }
 
 void showVector(int *v){
