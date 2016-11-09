@@ -395,30 +395,19 @@ int main(){
 
 	//show_multipartite_graph(m);
 	//showNsp(nsp);
-	//showConstraints(c);
+	//showConstraints(c1);
 
 	
 	//free_schedule(m);
 	
-
-	//freeNsp(nsp);
-	//free(nsp);
-	
 	freeConstraints(c1);
-	free(c1);
 	freeConstraints(c2);
-	free(c2);
 	freeConstraints(c3);
-	free(c3);
 	freeConstraints(c4);
-	free(c4);
 	freeConstraints(c5);
-	free(c5);
 	freeConstraints(c6);
-	free(c6);
 	freeConstraints(c7);
-	free(c7);
 	freeConstraints(c8);
-	free(c8);
-
+	freeNsp(nsp);
+	
 }
