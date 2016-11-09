@@ -252,6 +252,7 @@ Schedule* build_cost_matrix(NspLib* nsp, Constraints* c){
 
 		hungarian_free(p);
 		
+		
 		printf("Dia %d - ", d);
 		printList(day_per_nurse[d]);
 		printf("\n");
@@ -271,13 +272,15 @@ Schedule* build_cost_matrix(NspLib* nsp, Constraints* c){
 		free(m_assigment);
 		free(nurses_per_shift);
 	}
-
+	free(schedule_day);
 	free(shift_per_nurse);
 	//printf("Schedule cost: %d\n", schedule_cost);
 	
 	s->nurse_per_day = nurse_per_day;
 	s->day_per_nurse = day_per_nurse;
 	s->cost_solution = schedule_cost;
+
+
 
 	return s;
 }
