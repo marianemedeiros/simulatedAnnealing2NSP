@@ -148,6 +148,7 @@ void hungarian_free(hungarian_problem_t* p) {
   p->cost = NULL;
   p->assignment = NULL;
   p->assignment_vector = NULL;
+  free(p);
 }
 
 
