@@ -1,2 +1,4 @@
+libraries/*.o
+libraries/hungarian/*.o
 *.o
 all
