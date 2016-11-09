@@ -1,0 +1,7 @@
+1000:temp
+1:finalTemp
+100:it
+0.98:reduction
+1:vns
+50:K
+5:PERMUTATIONS
