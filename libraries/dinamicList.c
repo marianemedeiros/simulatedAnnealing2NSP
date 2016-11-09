@@ -363,9 +363,13 @@ List* copyList(List* list, List* newList){
 }
 
 void freeList(List* list){
-	Node* node = list->first;
+	Node* prev = list->first;
+	Node* node = list->first->next;
 	while(node != NULL){
-		free(node);
+		free(prev);
+		prev = node;
 		node = node->next;
 	}
+	free(prev);
+	free(node);
 }
