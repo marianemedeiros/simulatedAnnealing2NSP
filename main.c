@@ -280,7 +280,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 }
 
 
-void saveDatas(char* name, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s, int initial_cost){
+void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s, int initial_cost){
    FILE *fp;
 
    fp = fopen(name, "a+");
@@ -289,7 +289,7 @@ void saveDatas(char* name, char* constraint, int temp, int finalTemp, int it, do
    	printf("nao abriu\n");
 
    //fprintf(fp, "Constraints File;Temperature;Final Temp;Iterations;Reduction Rate;VNS;K;Initial cost;Final Cost\n", constraint, temp, finalTemp, it, reduction, vns, K,initial_cost, s->cost_solution);
-   fprintf(fp, "%s;%d;%d;%d;%f;%d;%d;%d;%d\n", constraint, temp, finalTemp, it, reduction, vns, K, initial_cost, s->cost_solution);
+   fprintf(fp, "%s,%s;%d;%d;%d;%f;%d;%d;%d;%d\n", name1,constraint, temp, finalTemp, it, reduction, vns, K, initial_cost, s->cost_solution);
    	fclose(fp);
 }
 
@@ -359,7 +359,7 @@ int main(){
 	char* saveAt = (char*) calloc(256,sizeof(char));
 	char* saveAt_2 = (char*) calloc(256,sizeof(char));
 	saveAt = strcat(saveAt, "resultados/7290.txt");
-	saveAt_2 = strcat(saveAt_2, "resultados/7290.cvs");
+	saveAt_2 = strcat(saveAt_2, "resultados/resuts.cvs");
 
 	c1 = readConstrainstsFile((char*)"files/casos-1-8/1.gen");
 	c2 = readConstrainstsFile((char*)"files/casos-1-8/2.gen");
@@ -370,13 +370,13 @@ int main(){
 	c7 = readConstrainstsFile((char*)"files/casos-1-8/7.gen");
 	c8 = readConstrainstsFile((char*)"files/casos-1-8/8.gen");
 
-    NspLib* nsp =  readNspFile("files/7290.nsp");
+    NspLib* nsp =  readNspFile("files/N25/7290.nsp");
 
  	Schedule *m =  build_cost_matrix(nsp, c1);
 	m->cost_solution = cost_solution(m, c1, nsp);
 	Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);   			
 
@@ -386,7 +386,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c2, nsp);	
 	name1[0] = '2';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);   			
 
@@ -395,7 +395,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c3, nsp);	
 	name1[0] = '3';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);  
 
@@ -404,7 +404,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c4, nsp);	
 	name1[0] = '4';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);  
 
@@ -413,7 +413,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c5, nsp);	
 	name1[0] = '5';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);  
 
@@ -422,7 +422,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c6, nsp);	
 	name1[0] = '6';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);  
     
@@ -431,7 +431,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c7, nsp);	
 	name1[0] = '7';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);  
 
@@ -440,7 +440,7 @@ int main(){
 	rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c8, nsp);	
 	name1[0] = '8';
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt,name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	free_schedule(rt);
 	free_schedule(m);  
 
