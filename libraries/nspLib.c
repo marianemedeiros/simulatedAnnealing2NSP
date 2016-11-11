@@ -73,11 +73,14 @@ void readLine(char* line, int* vector){
 //	return vector;
 }
 
-NspLib* readNspFile(char* url){
+NspLib* readNspFile(char* file_name){
 NspLib* nsp = (NspLib*) calloc(1, sizeof(NspLib));
 
 int index_c_m = 0; // index coverage matrix
 int index_p_m = 0; // index preference matrix
+
+char url[22] = "files/N25/";
+strcat(url, file_name);
 
 FILE* arq = fopen(url,"rt");
 char* line = (char*) calloc(1000, sizeof(char));

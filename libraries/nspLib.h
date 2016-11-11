@@ -19,7 +19,7 @@ typedef struct nspLib{
 void showVector(int *v);
 //List* line2list(char* line);
 //int* readLine(char* line, int size);
-NspLib* readNspFile(char* url);
+NspLib* readNspFile(char* file_name);
 Constraints* readConstrainstsFile(char* url);
 void showConstraints(Constraints* c);
 void showNsp(NspLib* nsp);
