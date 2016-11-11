@@ -19,7 +19,7 @@ int n_nurses = 25;
 int n_days = 7;
 int n_shifts = 4;
  
-Constraints* c2;
+Constraints* c6;
 
 void free_schedule(Schedule* s){
 	for (int i = 0; i < n_days; i++){
@@ -344,11 +344,11 @@ free(line);
 
 int main(){
 	readParams();
-	c2 = readConstrainstsFile((char*)"files/casos-1-8/2.gen");
-	char name1[2] = "2";
+	c6 = readConstrainstsFile((char*)"files/casos-1-8/6.gen");
+	char name1[2] = "6";
 
 	char* saveAt_2 = (char*) calloc(256,sizeof(char));
-	saveAt_2 = strcat(saveAt_2, "resultados/resuts2.cvs");
+	saveAt_2 = strcat(saveAt_2, "resultados/resuts6.cvs");
 
 	DIR * directory;
 	struct dirent *dir;
@@ -363,10 +363,10 @@ int main(){
 	        
 	        NspLib* nsp =  readNspFile(dir->d_name);
 
-	        Schedule *m =  build_cost_matrix(nsp, c2);
-			m->cost_solution = cost_solution(m, c2, nsp);
+	        Schedule *m =  build_cost_matrix(nsp, c6);
+			m->cost_solution = cost_solution(m, c6, nsp);
 				
-			Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c2, nsp);	
+			Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c6, nsp);	
 
 			char* saveAt = (char*) calloc(256,sizeof(char));
 			strcat(saveAt, "resultados/");
@@ -385,5 +385,5 @@ int main(){
 	}
 
 
-	freeConstraints(c2);
+	freeConstraints(c6);
 }
