@@ -2,10 +2,10 @@
 
 CC = g++
 CFLAGS = -Wall -g
-DEPS = libraries/dinamicList.h libraries/strings.h libraries/nspLib.h libraries/hungarian/hungarian.h libraries/assignment_problem.h
-OBJ = main7.o libraries/dinamicList.o libraries/strings.o libraries/nspLib.o libraries/hungarian/hungarian.o libraries/assignment_problem.o
+DEPS = libraries/dinamicList.h libraries/strings.h libraries/nspLib.h libraries/hungarian/hungarian.h libraries/assignment_problem.h libraries/operators.h
+OBJ = main.o libraries/dinamicList.o libraries/strings.o libraries/nspLib.o libraries/hungarian/hungarian.o libraries/assignment_problem.o libraries/operators.o
 
-main7: $(OBJ)
+main: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c $(DEPS)
