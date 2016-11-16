@@ -34,6 +34,8 @@ void addLastList(List* list, ItemType element);
 void addList(List* list, ItemType element, int index);
 int removeList(List* list, ItemType* element, int index);
 int removeElementList(List* list, ItemType element);
+Node* getNodeByIndex(List* list, int index);
+
 int getList(List* list, ItemType* element, int index);
 int setList(List* list, ItemType element, int index);
 int indexOfList(List* list, ItemType element);

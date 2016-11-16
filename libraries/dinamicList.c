@@ -240,6 +240,23 @@ ItemType getElementByIndex(List* list, int index){
 	return -2;
 }
 
+Node* getNodeByIndex(List* list, int index){
+	int i;
+	Node* aux = list->first;
+	if(index > list->size || index < 0){
+		return NULL;
+	}
+	else{
+		for(i = 0; i < list->size; i++){
+			if(index == i){
+				return aux;
+			}
+			aux = aux->next;
+		}
+	}
+	return NULL;
+}
+
 /**
  * Replaces the element by index.
  *
