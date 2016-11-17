@@ -368,8 +368,9 @@ int main(){
 
  	Schedule *m =  build_cost_matrix(nsp, c1);
 	
-	List** t = copy_nurse_per_day(m->nurse_per_day);
+	Schedule* t = copy_solution(m);
 	pcr(t, nsp, c1);
+	free_schedule(t);
 	//m->cost_solution = cost_solution(m, c1, nsp);
 	//Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
 	

@@ -1,209 +1,195 @@
 #include "operators.h"
 
+int verify_minimum_coverage1(int** coverage_matrix, int** minimum_coverage){
+	int r = 0;
+	if(minimum_coverage[0][0] < coverage_matrix[0][0])
+		r++;
+	if(minimum_coverage[0][1] < coverage_matrix[0][1])
+		r++;
+	if(minimum_coverage[0][2] < coverage_matrix[0][2])
+		r++;
+	if(minimum_coverage[0][3] < coverage_matrix[0][3])
+		r++;
 
-// quantos e quais turnos sao atribuidos em cada dia.
-int* shifts_per_day1(List** schedule, int day){
-	int	*rt = (int*) calloc(n_shifts, sizeof(int));
+	if(minimum_coverage[1][0] < coverage_matrix[1][0])
+		r++;
+	if(minimum_coverage[1][1] < coverage_matrix[1][1])
+		r++;
+	if(minimum_coverage[1][2] < coverage_matrix[1][2])
+		r++;
+	if(minimum_coverage[1][3] < coverage_matrix[1][3])
+		r++;
 
-	for (int i = 0; i < n_nurses; i++){
-		int e = getElementByIndex(schedule[i],day);
-		if(e == MORNING)
-			rt[0]++;
-		if(e == EVENING)
-			rt[1]++;
-		if(e == NIGHT)
-			rt[2]++;
+	if(minimum_coverage[2][0] < coverage_matrix[2][0])
+		r++;
+	if(minimum_coverage[2][1] < coverage_matrix[2][1])
+		r++;
+	if(minimum_coverage[2][2] < coverage_matrix[2][2])
+		r++;
+	if(minimum_coverage[2][3] < coverage_matrix[2][3])
+		r++;
+
+	if(minimum_coverage[3][0] < coverage_matrix[3][0])
+		r++;
+	if(minimum_coverage[3][1] < coverage_matrix[3][1])
+		r++;
+	if(minimum_coverage[3][2] < coverage_matrix[3][2])
+		r++;
+	if(minimum_coverage[3][3] < coverage_matrix[3][3])
+		r++;
+
+	if(minimum_coverage[4][0] < coverage_matrix[4][0])
+		r++;
+	if(minimum_coverage[4][1] < coverage_matrix[4][1])
+		r++;
+	if(minimum_coverage[4][2] < coverage_matrix[4][2])
+		r++;
+	if(minimum_coverage[4][3] < coverage_matrix[4][3])
+		r++;
+
+	if(minimum_coverage[5][0] < coverage_matrix[5][0])
+		r++;
+	if(minimum_coverage[5][1] < coverage_matrix[5][1])
+		r++;
+	if(minimum_coverage[5][2] < coverage_matrix[5][2])
+		r++;
+	if(minimum_coverage[5][3] < coverage_matrix[5][3])
+		r++;
+
+	if(minimum_coverage[6][0] < coverage_matrix[6][0])
+		r++;
+	if(minimum_coverage[6][1] < coverage_matrix[6][1])
+		r++;
+	if(minimum_coverage[6][2] < coverage_matrix[6][2])
+		r++;
+	if(minimum_coverage[6][3] < coverage_matrix[6][3])
+		r++;
+
+
+	return r;
+}
+
+int** shifts_per_day1(List** day_per_nurse){
+	int** rt = (int**) calloc(n_days, sizeof(int*));
+	
+	for (int d = 0; d < n_days; d++){
+		rt[d] = (int*) calloc(n_shifts, sizeof(int));
+		List* nurses = day_per_nurse[d];
+		Node* e = nurses->first;
+
+		while(e != NULL){
+			if(e->data == MORNING)
+				rt[d][MORNING]++;
+			if(e->data == EVENING)
+				rt[d][EVENING]++;
+			if(e->data == NIGHT)
+				rt[d][NIGHT]++;
+			if(e->data == FREE)
+				rt[d][FREE]++;
+			e = e->next;	
+		}
 	}
 	return rt;
 }
+ //turnos sequencias proibidos e att consecutivas
+int sequencial_shifts(List* nurse_per_day, int* vet){
+	int cont= 0;
+		Node* node = nurse_per_day->first;
+		while(node->next != NULL){
+			Node* aux = node->next;
+			int cont = 0;
+			if(node->data == EVENING && aux->data == MORNING){
+				cont++;
+			}
+			else if(node->data == NIGHT && aux->data == MORNING){
+				cont++;
+			}
+			else if(node->data == NIGHT && aux->data == EVENING){
+				cont++;
+			}
 
-int verify_minimum_coverage1(int* coverage_matrix, int* minimum_coverage){
-	if(minimum_coverage[0] < coverage_matrix[0])
-		return 1;
-	if(minimum_coverage[1] < coverage_matrix[1])
-		return 1;
-	if(minimum_coverage[2] < coverage_matrix[2])
-		return 1;
-	if(minimum_coverage[3] < coverage_matrix[3])
-		return 1;
-	return 0;
+			if(node->data == aux->data)
+				cont++;
+
+			if(node->data != FREE)
+				(*vet)++;
+
+			node = node->next;
+		}
+	return cont;
 }
 
-int* same_assignments(List** list, int nurse){
-	int *rt = (int*) calloc(n_shifts, sizeof(int));
 
-	for (int i = 0; i < n_days; i++){
-		List* l1 = list[i];
-		List* l2 = list[i+1];
-		int s1 = getElementByIndex(l1,nurse);
-		int s2 = getElementByIndex(l2,nurse);
+int verify_constraints(NspLib* nsp, Constraints*c , List* s){
+	//int** minimum_coverage = shifts_per_day1(s->day_per_nurse);
+	//int x = verify_minimum_coverage1(nsp->coverage_matrix, minimum_coverage);
+	//int nSCV = x;
 
-		if(s1 == s2 && s1 == 0)
-			rt[0]++;
-		if(s1 == s2 && s1 == 1)
-			rt[1]++;
-		if(s1 == s2 && s1 == 2)
-			rt[2]++;
-		if(s1 == s2 && s1 == 3)
-			rt[3]++;
-			
-	}
-	return rt;
-		
+	int vet = 0;
+	int nHCV = sequencial_shifts(s, &vet);
+
+	if (verify_number_of_assigments(vet, c->number_of_assigments) == 1)
+		nHCV+= nHCV;
+	return nHCV;
 }
 
-int getNextShift(List** list, int day, int nurse){
-	List* l1 = list[day];
-	List* l2 = list[day+1];
-	int s2 = getElementByIndex(l2,nurse);
-	return s2;
-}
+void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 
-/**
-void pcr2(List** day_per_nurse){
-
-	for (int day = 0; day < n_days; day++){
-		List* list_d1 = day_per_nurse[i];
-		Node* d1 = list_d1->first;
-		int index_d1 = 0;
-
-		List* list_d2 = day_per_nurse[i+1];
-		Node* d2 = list_d1->first;
-		int index_d2 = 0;
-
+	for (int day = 0; day < n_days-1; day++){
 		int** m_cost = (int**) calloc(n_nurses, sizeof(int*));
 		int** m_cost2 = (int**) calloc(n_nurses, sizeof(int*));
 		int** m_assigment = (int**) calloc(n_nurses, sizeof(int*));
 
+		for (int nurse1 = 0; nurse1 < n_nurses; nurse1++){
+			m_cost[nurse1] = (int*) calloc(n_nurses, sizeof(int));
+			m_cost2[nurse1] = (int*) calloc(n_nurses, sizeof(int));
+			m_assigment[nurse1] = (int*) calloc(n_nurses, sizeof(int));
 
-		while(d1->next != NULL){
-			while(d2->next != NULL){
-				int data_d2 = d2->data;
-				//troca o turno data_d1 (list_d1) por data_d2 
-				setList(list_d1, data_d2, index_d1);
-				int data_d1 = d1->data;
+			List* list1 = s->nurse_per_day[nurse1];
+			Node* n1 = getNodeByIndex(list1,day);
 
-				//faz os cálculos das retrições
-				int* minimum_coverage = shifts_per_day1(list_d1);
-				int* shift_per_nurse = shifts_per_nurse1(list_d1);
-				int* sa = same_assignments(list_d1, index_d1);
+			Node* aux = n1->next;
 
-				if(data_d1 == getNextShift(list_d1,day))
-					nHCV++;
+			for (int nurse2 = 0; nurse2 < n_nurses; nurse2++){
+				List* list2 = s->nurse_per_day[nurse2];
+				Node* n2 = getNodeByIndex(list2,day+1);
+				
+				n1->next = n2;
 
-				if(verify_consecutive_assigments(sa[data_d1], c->consecutive_assigments_matrix[data_d1][0], c->consecutive_assigments_matrix[data_d1][1]) == 1)
-					nHCV++;		
+				//printList(list1);
+				//printf("\n");
 
-				if (verify_number_of_assigments(shift_per_nurse, c->number_of_assigments) == 1)
-					nHCV++;
+				//calculos
+				int nHCV = verify_constraints(nsp, c, list1);
+				m_cost[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + Ph * nHCV;
+				m_cost2[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + Ph * nHCV;
+				m_assigment[nurse1][nurse2] = n2->data;
+				//final do calculo das constraints
 
-				if(verify_minimum_coverage1(nsp->coverage_matrix[day], minimum_coverage) == 1)
-					nSCV++;
-
-				free(sa);
-				free(shift_per_nurse);
-				free(minimum_coverage);
-
-				//if(nHCV != 0 || nSCV != 0)
-				int cost = nsp->preference_matrix[index_d1][(day*n_shifts)+nurse->data] + Ph * nHCV + Ps * nSCV;
-
-				m_cost[index_d1][index_d2] = cost;
-				m_cost2[index_d1][index_d2] = cost;
-				m_assigment[index_d1][index_d2] = data_d2;
-
-				index_d2 = index_d2 + 1;
-				d2 = d2->next;
+				n1->next = aux;
 			}
-
-			index_d1 = index_d1 + 1;
-			d1 = d1->next;
+			//printf("\n\n");
 		}
 
-		//hungaro
+		 //hungaro
+		//hungarian algorithm
 		hungarian_problem_t *p = (hungarian_problem_t*) calloc(1,sizeof(hungarian_problem_t));
 		
 		hungarian_init(p, m_cost2 , n_nurses,n_nurses, HUNGARIAN_MODE_MINIMIZE_COST) ;
 		hungarian_solve(p);
-		
+		hungarian_print_assignment_vector(p->assignment_vector,n_nurses,day);
+
+		for (int i = 0; i < n_nurses; i++){
+			printf("%d ", m_assigment[i][p->assignment_vector[i]]); 
+		}
 		//free(schedule_day);
 		//schedule_day = (int*) calloc(n_nurses, sizeof(int));
 		//int c = combine_schedule(shift_per_nurse, m_cost, p->assignment_vector, m_assigment, nurse_per_day, day_per_nurse, d, schedule_day);
 
 		hungarian_free(p);
 
-		//fim do hungaro
-		for (int i = 0; i < n_nurses; i++){
-			free(m_cost[i]);
-			free(m_cost2[i]);
-			free(m_assigment[i]);
-		}
-		free(m_cost);
-		free(m_cost2);
-		free(m_assigment);
-	}
 
-
-}
-**/
-
-int* shifts_per_nurse1(List** nurse_per_day){
-	int	*rt = (int*) calloc(n_nurses, sizeof(int));
-
-	for (int i = 0; i < n_nurses; i++){
-		Node* aux = nurse_per_day[i]->first;
-		while(aux != NULL){
-			if(aux->data != FREE)
-				rt[i]++;
-			aux = aux->next;
-		}
-	}
-	return rt;
-}
-
-void pcr(List** nurse_per_day, NspLib* nsp, Constraints* c){
-
-	for (int day = 0; day < n_days; day++){
-		int** m_cost = (int**) calloc(n_nurses, sizeof(int*));
-		int** m_cost2 = (int**) calloc(n_nurses, sizeof(int*));
-		int** m_assigment = (int**) calloc(n_nurses, sizeof(int*));
-
-		for (int nurse1 = 0; nurse1 < n_nurses; nurse1++){
-			List* list1 = nurse_per_day[nurse1];
-			Node* n1 = getNodeByIndex(list1,day);
-			Node* aux = n1->next;
-
-			for (int nurse2 = 0; nurse2 < n_nurses; nurse2++){
-				int nSCV = 0, nHCV = 0;
-				List* list2 = nurse_per_day[nurse2];
-				Node* n2 = getNodeByIndex(list2,day+1);
-				n1->next = n2;
-				printList(nurse_per_day[day]);
-				printf("\n");
-				//calculos
-				//verify_constraints(list1);
-				int* minimum_coverage = shifts_per_day1(nurse_per_day, day);
-				int* shift_per_nurse = shifts_per_nurse1(nurse_per_day);
-
-				if(verify_minimum_coverage1(nsp->coverage_matrix[day], minimum_coverage) == 1)
-					nSCV++;
-				
-				for (int i = 0; i < n_nurses; i++){
-					printf("%d ", shift_per_nurse[i]);
-					if(verify_number_of_assigments(shift_per_nurse[i], c->number_of_assigments))
-						nHCV++;
-				}
-				
-				if(nSCV != 0 || nHCV != 0)
-					printf("nSCV: %d\n", nHCV);
-
-				free(minimum_coverage);
-				free(shift_per_nurse);
-				n1->next = aux;
-			}
-			printf("\n\n");
-		}
 		printf("\n\n\n");
-
 		for (int i = 0; i < n_nurses; i++){
 			free(m_cost[i]);
 			free(m_cost2[i]);
