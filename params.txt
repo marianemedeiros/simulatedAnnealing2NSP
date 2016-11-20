@@ -3,5 +3,5 @@
 100:it
 0.98:reduction
 1:vns
-50:K
+10:K
 5:PERMUTATIONS
