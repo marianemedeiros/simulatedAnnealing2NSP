@@ -62,7 +62,7 @@ void addLastList(List* list, ItemType element){
 		list->last->next = (Node*) calloc(1,sizeof(Node));
 		list->last->next->data = element;
 		list->last = list->last->next;
-		list->last->next == NULL;
+		//list->last->next == NULL;
 		list->size++;		
 	}
 }

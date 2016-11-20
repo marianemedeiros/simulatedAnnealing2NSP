@@ -399,7 +399,6 @@ void hungarian_solve(hungarian_problem_t* p)
   // End doublecheck the solution 23
   // End Hungarian algorithm 18
 
-  int c = 0;
   for (i=0;i<m;++i)
     {
       //printf("\nhungarian.c (412) : (turno atribuido: %d)\n i: %d, col_mate: %d \n (custo: %d)",p->m_assigment[i][col_mate[i]], i , col_mate[i], cost_m[i][col_mate[i]]);
