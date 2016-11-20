@@ -65,11 +65,10 @@ int verify_minimum_coverage1(int** coverage_matrix, int** minimum_coverage){
 	if(minimum_coverage[6][3] < coverage_matrix[6][3])
 		r++;
 
-
 	return r;
 }
 
-int** shifts_per_day1(List** day_per_nurse){
+int** shifts_per_day(List** day_per_nurse){
 	int** rt = (int**) calloc(n_days, sizeof(int*));
 	
 	for (int d = 0; d < n_days; d++){
@@ -91,6 +90,7 @@ int** shifts_per_day1(List** day_per_nurse){
 	}
 	return rt;
 }
+
  //turnos sequencias proibidos e att consecutivas
 int sequencial_shifts(List* nurse_per_day, int* vet){
 	int cont= 0;
@@ -98,15 +98,13 @@ int sequencial_shifts(List* nurse_per_day, int* vet){
 		while(node->next != NULL){
 			Node* aux = node->next;
 			int cont = 0;
-			if(node->data == EVENING && aux->data == MORNING){
+			if(node->data == EVENING && aux->data == MORNING)
 				cont++;
-			}
-			else if(node->data == NIGHT && aux->data == MORNING){
+			else if(node->data == NIGHT && aux->data == MORNING)
 				cont++;
-			}
-			else if(node->data == NIGHT && aux->data == EVENING){
+			else if(node->data == NIGHT && aux->data == EVENING)
 				cont++;
-			}
+			
 
 			if(node->data == aux->data)
 				cont++;
@@ -133,6 +131,21 @@ int verify_constraints(NspLib* nsp, Constraints*c , List* s){
 	return nHCV;
 }
 
+void recombine_schedule(int** m_assigment, int* assignment_vector, Schedule* s, int day){
+	if(day > 0){
+		for (int i = 0; i < n_nurses; i++){
+			setList(s->day_per_nurse[day],m_assigment[i][assignment_vector[i]],i);
+			//printList(s->day_per_nurse[day]);
+			//printf("\n");
+		}
+		//printf("\n");
+		for (int i = 0; i < n_nurses; i++){
+			setList(s->nurse_per_day[i], m_assigment[i][assignment_vector[i]],day);
+			//printList(s->nurse_per_day[i]);
+			//printf("\n");
+		}
+	}
+}
 void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 
 	for (int day = 0; day < n_days-1; day++){
@@ -153,12 +166,9 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 			for (int nurse2 = 0; nurse2 < n_nurses; nurse2++){
 				List* list2 = s->nurse_per_day[nurse2];
 				Node* n2 = getNodeByIndex(list2,day+1);
-				
+
 				n1->next = n2;
-
-				//printList(list1);
-				//printf("\n");
-
+				
 				//calculos
 				int nHCV = verify_constraints(nsp, c, list1);
 				m_cost[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + Ph * nHCV;
@@ -168,28 +178,20 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 
 				n1->next = aux;
 			}
-			//printf("\n\n");
 		}
-
 		 //hungaro
 		//hungarian algorithm
 		hungarian_problem_t *p = (hungarian_problem_t*) calloc(1,sizeof(hungarian_problem_t));
 		
 		hungarian_init(p, m_cost2 , n_nurses,n_nurses, HUNGARIAN_MODE_MINIMIZE_COST) ;
 		hungarian_solve(p);
-		hungarian_print_assignment_vector(p->assignment_vector,n_nurses,day);
+		//hungarian_print_assignment_vector(p->assignment_vector,n_nurses,day);
 
-		for (int i = 0; i < n_nurses; i++){
-			printf("%d ", m_assigment[i][p->assignment_vector[i]]); 
-		}
-		//free(schedule_day);
-		//schedule_day = (int*) calloc(n_nurses, sizeof(int));
-		//int c = combine_schedule(shift_per_nurse, m_cost, p->assignment_vector, m_assigment, nurse_per_day, day_per_nurse, d, schedule_day);
+		recombine_schedule(m_assigment, p->assignment_vector, s,day);
 
 		hungarian_free(p);
 
 
-		printf("\n\n\n");
 		for (int i = 0; i < n_nurses; i++){
 			free(m_cost[i]);
 			free(m_cost2[i]);
