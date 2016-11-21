@@ -1,68 +1,14 @@
 #include "operators.h"
 
-int verify_minimum_coverage1(int** coverage_matrix, int** minimum_coverage){
+int verify_minimum_coverage1(int* coverage_matrix, int* minimum_coverage){
 	int r = 0;
-	if(minimum_coverage[0][0] < coverage_matrix[0][0])
+	if(minimum_coverage[0] < coverage_matrix[0])
 		r++;
-	if(minimum_coverage[0][1] < coverage_matrix[0][1])
+	if(minimum_coverage[1] < coverage_matrix[1])
 		r++;
-	if(minimum_coverage[0][2] < coverage_matrix[0][2])
+	if(minimum_coverage[2] < coverage_matrix[2])
 		r++;
-	if(minimum_coverage[0][3] < coverage_matrix[0][3])
-		r++;
-
-	if(minimum_coverage[1][0] < coverage_matrix[1][0])
-		r++;
-	if(minimum_coverage[1][1] < coverage_matrix[1][1])
-		r++;
-	if(minimum_coverage[1][2] < coverage_matrix[1][2])
-		r++;
-	if(minimum_coverage[1][3] < coverage_matrix[1][3])
-		r++;
-
-	if(minimum_coverage[2][0] < coverage_matrix[2][0])
-		r++;
-	if(minimum_coverage[2][1] < coverage_matrix[2][1])
-		r++;
-	if(minimum_coverage[2][2] < coverage_matrix[2][2])
-		r++;
-	if(minimum_coverage[2][3] < coverage_matrix[2][3])
-		r++;
-
-	if(minimum_coverage[3][0] < coverage_matrix[3][0])
-		r++;
-	if(minimum_coverage[3][1] < coverage_matrix[3][1])
-		r++;
-	if(minimum_coverage[3][2] < coverage_matrix[3][2])
-		r++;
-	if(minimum_coverage[3][3] < coverage_matrix[3][3])
-		r++;
-
-	if(minimum_coverage[4][0] < coverage_matrix[4][0])
-		r++;
-	if(minimum_coverage[4][1] < coverage_matrix[4][1])
-		r++;
-	if(minimum_coverage[4][2] < coverage_matrix[4][2])
-		r++;
-	if(minimum_coverage[4][3] < coverage_matrix[4][3])
-		r++;
-
-	if(minimum_coverage[5][0] < coverage_matrix[5][0])
-		r++;
-	if(minimum_coverage[5][1] < coverage_matrix[5][1])
-		r++;
-	if(minimum_coverage[5][2] < coverage_matrix[5][2])
-		r++;
-	if(minimum_coverage[5][3] < coverage_matrix[5][3])
-		r++;
-
-	if(minimum_coverage[6][0] < coverage_matrix[6][0])
-		r++;
-	if(minimum_coverage[6][1] < coverage_matrix[6][1])
-		r++;
-	if(minimum_coverage[6][2] < coverage_matrix[6][2])
-		r++;
-	if(minimum_coverage[6][3] < coverage_matrix[6][3])
+	if(minimum_coverage[3] < coverage_matrix[3])
 		r++;
 
 	return r;
@@ -117,18 +63,34 @@ int sequencial_shifts(List* nurse_per_day, int* vet){
 	return cont;
 }
 
+int* shifts_per_day2(List** nurse_per_day, int d){
+	int* rt = (int*) calloc(n_shifts, sizeof(int));
+	
+	for (int i = 0; i < n_nurses; i++){
+		int e = getElementByIndex(nurse_per_day[i], d);
+		//printf("%d ", e);
+		if(e == MORNING)
+			rt[MORNING]++;
+		if(e == EVENING)
+			rt[EVENING]++;
+		if(e == NIGHT)
+			rt[NIGHT]++;
+		if(e == FREE)
+			rt[FREE]++;
+	}
 
-int verify_constraints(NspLib* nsp, Constraints*c , List* s){
-	//int** minimum_coverage = shifts_per_day1(s->day_per_nurse);
-	//int x = verify_minimum_coverage1(nsp->coverage_matrix, minimum_coverage);
-	//int nSCV = x;
+	//printf("day: %d (m: %d, t: %d, n: %d, f: %d)\n", d, rt[MORNING], rt[EVENING], rt[NIGHT], rt[FREE]);
+	return rt;
+}
 
+
+int verify_constraints(NspLib* nsp, Constraints*c , Schedule* sc, int n, int day){
 	int vet = 0;
-	int nHCV = sequencial_shifts(s, &vet);
+	int nHCV = sequencial_shifts(sc->nurse_per_day[n], &vet);
 
 	if (verify_number_of_assigments(vet, c->number_of_assigments) == 1)
 		nHCV+= nHCV;
-	return nHCV;
+	return (Ph * nHCV);
 }
 
 void recombine_schedule(int** m_assigment, int* assignment_vector, Schedule* s, int day){
@@ -170,10 +132,16 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 				n1->next = n2;
 				
 				//calculos
-				int nHCV = verify_constraints(nsp, c, list1);
-				m_cost[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + Ph * nHCV;
-				m_cost2[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + Ph * nHCV;
-				m_assigment[nurse1][nurse2] = n2->data;
+				int* minimum_coverage = shifts_per_day2(s->nurse_per_day,day+1);
+				int x = verify_minimum_coverage1(nsp->coverage_matrix[day+1], minimum_coverage);
+				free(minimum_coverage);
+
+				if(x == 0){
+					int cons = verify_constraints(nsp, c, s, nurse1, day+1);
+					m_cost[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + cons;
+					m_cost2[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + cons;
+					m_assigment[nurse1][nurse2] = n2->data;
+				}
 				//final do calculo das constraints
 
 				n1->next = aux;
@@ -187,10 +155,9 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 		hungarian_solve(p);
 		//hungarian_print_assignment_vector(p->assignment_vector,n_nurses,day);
 
-		recombine_schedule(m_assigment, p->assignment_vector, s,day);
+		recombine_schedule(m_assigment, p->assignment_vector, s,day+1);
 
 		hungarian_free(p);
-
 
 		for (int i = 0; i < n_nurses; i++){
 			free(m_cost[i]);
@@ -201,6 +168,42 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 		free(m_cost2);
 		free(m_assigment);
 	}
+}
 
+void prt(Schedule* s, NspLib* nsp, Constraints* c){
+	for (int d = 0; d < n_days; d++){
 
+		for (int nurse1 = 0; nurse1 < n_nurses; nurse1++){
+			List* list1 = s->nurse_per_day[nurse1];
+			Node* n1 = getNodeByIndex(list1,d);
+
+			Node* aux = n1->next;
+
+			for (int nurse2 = 0; nurse2 < n_nurses; nurse2++){
+				List* list2 = s->nurse_per_day[nurse2];
+				Node* n2 = getNodeByIndex(list2,d+1);
+
+				n1->next = n2;
+			
+				Node* p_n1; Node* p_aux;
+				if(d > 0){
+					p_n1 = getNodeByIndex(list2, d-1);
+					p_aux = p_n1->next;
+
+					p_n1->next = n1;
+				}
+				
+				//calcula custos
+				printf("Day %d\n", d);
+				printList(list1);
+				printf("\n");
+				break;
+
+				if(d > 0)
+					p_n1->next = p_aux;
+				n1->next = aux;
+			}
+			break;
+		}
+	}
 }
