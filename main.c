@@ -249,7 +249,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 	return best_s;
 }
 
-void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s, int initial_cost){
+void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s, int initial_cost, double t){
    FILE *fp;
 
    fp = fopen(name, "a+");
@@ -258,7 +258,7 @@ void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTem
    	printf("nao abriu\n");
 
    //fprintf(fp, "Constraints File;Temperature;Final Temp;Iterations;Reduction Rate;VNS;K;Initial cost;Final Cost\n", constraint, temp, finalTemp, it, reduction, vns, K,initial_cost, s->cost_solution);
-   fprintf(fp, "%s,%s;%d;%d;%d;%f;%d;%d;%d;%d\n", name1,constraint, temp, finalTemp, it, reduction, vns, K, initial_cost, s->cost_solution);
+   fprintf(fp, "%s,%s;%d;%d;%d;%f;%d;%d;%d;%d;%f\n", name1,constraint, temp, finalTemp, it, reduction, vns, K, initial_cost, s->cost_solution,t);
    	fclose(fp);
 }
 
@@ -320,16 +320,10 @@ free(line);
 free(arq);
 }
 
-List** copy_nurse_per_day(List** nurse_per_day){
-	List** rt = (List**) calloc(n_nurses, sizeof(List*));
-	
-	for (int i = 0; i < n_nurses; i++){
-		rt[i] = (List*) calloc(n_days, sizeof(List));
-		rt[i] = copyList(nurse_per_day[i], rt[i]);	
-	}
-	return rt;
-}
+
+
 int main(){
+	clock_t ticT = clock();
 	readParams();
 	
 	char name1[2] = "1";
@@ -343,22 +337,41 @@ int main(){
 	NspLib* nsp =  readNspFile("7290.nsp");
 
  	Schedule *m =  build_cost_matrix(nsp, c1);
+ 	show_multipartite_graph(m,1);
 	m->cost_solution = cost_solution(m, c1, nsp);
+	prt(m,nsp,c1);
+	/*
+	printf("cost: %d\n", m->cost_solution);
+
+	pcr(m,nsp,c1);
+	show_multipartite_graph(m);
+	m->cost_solution = cost_solution(m, c1, nsp);
+	printf("pcr: %d\n", m->cost_solution);
+	*/
 	
+	/*
+	clock_t tic = clock();
 	Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
-	
-	//saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	//saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	clock_t toc = clock();
+
+	double executed = (double)(toc - tic) / CLOCKS_PER_SEC;
+	printf("Time elapsed in simulated annealing: %f seconds\n", executed);
+
+	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
+	saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution, executed);
 	
 	free_schedule(rt);
 	free_schedule(m);   			
-
-
+	
  
 	free(saveAt);
 	free(saveAt_2);
     freeNsp(nsp);
 	freeConstraints(c1);
 	
+	clock_t tocT = clock();
 
+	double executedT = (double)(tocT - ticT) / CLOCKS_PER_SEC;
+	printf("Elapsed All Program: %f seconds\n", executedT);
+	*/
 }
