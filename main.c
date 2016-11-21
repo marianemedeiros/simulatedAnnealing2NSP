@@ -3,7 +3,7 @@
 #include<string.h>
 #include<math.h>
 #include<time.h>
-#include <dirent.h> 
+#include <dirent.h>
 #include "libraries/operators.h"
 
 int PERMUTATIONS;
@@ -18,7 +18,7 @@ int vns;
 int n_nurses = 25;
 int n_days = 7;
 int n_shifts = 4;
- 
+
 Constraints* c1;
 
 void free_schedule(Schedule* s){
@@ -52,14 +52,14 @@ int* shifts_per_nurse(List** nurse_per_day){
 }
 
 //nurse_per_day - dia esta na coluna
-//day_per_nurse - nurse esta na coluna 
+//day_per_nurse - nurse esta na coluna
 int cost_solution(Schedule* s, Constraints* c, NspLib* nsp){
 	int** minimum_coverage = shifts_per_day(s->day_per_nurse);
 	int** same_assignments = (int**) calloc(n_nurses, sizeof(int*));
 	int* shift_per_nurse = shifts_per_nurse(s->nurse_per_day);
 
 	int total_cost = 0;
-	
+
 	for (int d = 0; d < n_days; d++){
 		List* day_schedule = s->day_per_nurse[d];
 		Node* nurse = day_schedule->first;
@@ -73,16 +73,16 @@ int cost_solution(Schedule* s, Constraints* c, NspLib* nsp){
 			//verify next shift
 			if(d != (n_days-1)){
 				int next_shift = getElementByIndex(s->day_per_nurse[d+1],index_n);
-				
+
 				if(verify_shift(next_shift,nurse->data) == 1)
 					nHCV++;
-				
+
 				if(nurse->data == next_shift)
 						same_assignments[index_n][nurse->data]++;
 			}
 
 			if(verify_consecutive_assigments(same_assignments[index_n][nurse->data], c->consecutive_assigments_matrix[nurse->data][0], c->consecutive_assigments_matrix[nurse->data][1]) == 1)
-				nHCV++;							
+				nHCV++;
 
 			//percorre o vetor verificando quantos turnos tem a nurse e depois verifica se a qntd quebra a regra ou nao
 			if (verify_number_of_assigments(shift_per_nurse[index_n], c->number_of_assigments) == 1)
@@ -144,18 +144,18 @@ Schedule* generate_neighbor(Schedule* s, int changes){
 
 Schedule* copy_solution(Schedule* s){
 	Schedule* rt = (Schedule*) calloc(1,sizeof(Schedule));
-	
+
 	List** nurse_per_day = (List**) calloc(n_nurses, sizeof(List*));
 	List** day_per_nurse = (List**) calloc(n_days, sizeof(List*));
-	
+
 	for (int i = 0; i < n_nurses; i++){
 		nurse_per_day[i] = (List*) calloc(n_days, sizeof(List));
-		nurse_per_day[i] = copyList(s->nurse_per_day[i], nurse_per_day[i]);	
+		nurse_per_day[i] = copyList(s->nurse_per_day[i], nurse_per_day[i]);
 	}
-	
+
 	for (int i = 0; i < n_days; i++){
 		day_per_nurse[i] = (List*) calloc(n_nurses, sizeof(List));
-		day_per_nurse[i] = copyList(s->day_per_nurse[i], day_per_nurse[i]);	
+		day_per_nurse[i] = copyList(s->day_per_nurse[i], day_per_nurse[i]);
 	}
 
 	rt->nurse_per_day = nurse_per_day;
@@ -193,7 +193,7 @@ Schedule* vnd(Schedule* s, int neighbor_struct, Constraints* c, NspLib* nsp){
 		}else
 			k++;
 	}
-	
+
 	if(aux == 0)
 		free_schedule(s_2line);
 
@@ -212,7 +212,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 			//s_line = generate_neighbor(s_line, PERMUTATIONS);
 			s_line->cost_solution = cost_solution(s_line, c, nsp);
 			int delta_custo = 0;
-			
+
 
 			if(use_vnd == 1){
 				Schedule* s_2line = vnd(s_line, K ,c,nsp);
@@ -228,15 +228,15 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 				current_s = copy_solution(s_line);
 
 			}
-				
+
 			if(current_s->cost_solution < best_s->cost_solution){
 				//printf("free best:::: %d\n", best_s->cost_solution);
 				free_schedule(best_s);
 				//best_s = (Schedule*) calloc(1, sizeof(Schedule));
 				best_s = copy_solution(current_s);
-				
+
 				printf("-- Cost: %d (it: %d, t: %d)\n", best_s->cost_solution, i, t);
-			
+
 					//show_multipartite_graph(best_s);
 			}
 		free_schedule(s_line);
@@ -292,7 +292,7 @@ char* line = (char*) calloc(1000, sizeof(char));
 int i = 0;
 	if(!arq){
 	     perror("Can't open file.");
- 		exit(1);			
+ 		exit(1);
 	}else{
 		while(!feof(arq)){
 			fgets(line, 1000, arq);
@@ -325,7 +325,7 @@ free(arq);
 int main(){
 	clock_t ticT = clock();
 	readParams();
-	
+
 	char name1[2] = "1";
 	char* saveAt = (char*) calloc(256,sizeof(char));
 	char* saveAt_2 = (char*) calloc(256,sizeof(char));
@@ -333,25 +333,25 @@ int main(){
 	saveAt_2 = strcat(saveAt_2, "resultados/resuts.cvs");
 
 	c1 = readConstrainstsFile((char*)"files/casos-1-8/1.gen");
-	
+
 	NspLib* nsp =  readNspFile("7290.nsp");
 
  	Schedule *m =  build_cost_matrix(nsp, c1);
- 	show_multipartite_graph(m,1);
+ 	show_multipartite_graph(m,0);
 	m->cost_solution = cost_solution(m, c1, nsp);
 	prt(m,nsp,c1);
-	/*
-	printf("cost: %d\n", m->cost_solution);
 
+	printf("cost: %d\n", m->cost_solution);
+	/*
 	pcr(m,nsp,c1);
 	show_multipartite_graph(m);
 	m->cost_solution = cost_solution(m, c1, nsp);
 	printf("pcr: %d\n", m->cost_solution);
 	*/
-	
+
 	/*
 	clock_t tic = clock();
-	Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);	
+	Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);
 	clock_t toc = clock();
 
 	double executed = (double)(toc - tic) / CLOCKS_PER_SEC;
@@ -359,16 +359,16 @@ int main(){
 
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
 	saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution, executed);
-	
+
 	free_schedule(rt);
-	free_schedule(m);   			
-	
- 
+	free_schedule(m);
+
+
 	free(saveAt);
 	free(saveAt_2);
     freeNsp(nsp);
 	freeConstraints(c1);
-	
+
 	clock_t tocT = clock();
 
 	double executedT = (double)(tocT - ticT) / CLOCKS_PER_SEC;
