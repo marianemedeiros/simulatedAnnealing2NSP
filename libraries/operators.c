@@ -16,7 +16,7 @@ int verify_minimum_coverage1(int* coverage_matrix, int* minimum_coverage){
 
 int** shifts_per_day(List** day_per_nurse){
 	int** rt = (int**) calloc(n_days, sizeof(int*));
-	
+
 	for (int d = 0; d < n_days; d++){
 		rt[d] = (int*) calloc(n_shifts, sizeof(int));
 		List* nurses = day_per_nurse[d];
@@ -31,7 +31,7 @@ int** shifts_per_day(List** day_per_nurse){
 				rt[d][NIGHT]++;
 			if(e->data == FREE)
 				rt[d][FREE]++;
-			e = e->next;	
+			e = e->next;
 		}
 	}
 	return rt;
@@ -50,7 +50,7 @@ int sequencial_shifts(List* nurse_per_day, int* vet){
 				cont++;
 			else if(node->data == NIGHT && aux->data == EVENING)
 				cont++;
-			
+
 
 			if(node->data == aux->data)
 				cont++;
@@ -65,7 +65,7 @@ int sequencial_shifts(List* nurse_per_day, int* vet){
 
 int* shifts_per_day2(List** nurse_per_day, int d){
 	int* rt = (int*) calloc(n_shifts, sizeof(int));
-	
+
 	for (int i = 0; i < n_nurses; i++){
 		int e = getElementByIndex(nurse_per_day[i], d);
 		//printf("%d ", e);
@@ -130,7 +130,7 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 				Node* n2 = getNodeByIndex(list2,day+1);
 
 				n1->next = n2;
-				
+
 				//calculos
 				int* minimum_coverage = shifts_per_day2(s->nurse_per_day,day+1);
 				int x = verify_minimum_coverage1(nsp->coverage_matrix[day+1], minimum_coverage);
@@ -150,7 +150,7 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 		 //hungaro
 		//hungarian algorithm
 		hungarian_problem_t *p = (hungarian_problem_t*) calloc(1,sizeof(hungarian_problem_t));
-		
+
 		hungarian_init(p, m_cost2 , n_nurses,n_nurses, HUNGARIAN_MODE_MINIMIZE_COST) ;
 		hungarian_solve(p);
 		//hungarian_print_assignment_vector(p->assignment_vector,n_nurses,day);
@@ -171,9 +171,16 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 }
 
 void prt(Schedule* s, NspLib* nsp, Constraints* c){
-	for (int d = 0; d < n_days; d++){
+	for (int d = 0; d < n_days-1; d++){
+		int** m_cost = (int**) calloc(n_nurses, sizeof(int*));
+		int** m_cost2 = (int**) calloc(n_nurses, sizeof(int*));
+		int** m_assigment = (int**) calloc(n_nurses, sizeof(int*));
 
 		for (int nurse1 = 0; nurse1 < n_nurses; nurse1++){
+			m_cost[nurse1] = (int*) calloc(n_nurses, sizeof(int));
+			m_cost2[nurse1] = (int*) calloc(n_nurses, sizeof(int));
+			m_assigment[nurse1] = (int*) calloc(n_nurses, sizeof(int));
+
 			List* list1 = s->nurse_per_day[nurse1];
 			Node* n1 = getNodeByIndex(list1,d);
 
@@ -184,7 +191,7 @@ void prt(Schedule* s, NspLib* nsp, Constraints* c){
 				Node* n2 = getNodeByIndex(list2,d+1);
 
 				n1->next = n2;
-			
+
 				Node* p_n1; Node* p_aux;
 				if(d > 0){
 					p_n1 = getNodeByIndex(list2, d-1);
@@ -192,18 +199,38 @@ void prt(Schedule* s, NspLib* nsp, Constraints* c){
 
 					p_n1->next = n1;
 				}
-				
+
 				//calcula custos
-				printf("Day %d\n", d);
-				printList(list1);
-				printf("\n");
-				break;
+				//int* minimum_coverage = shifts_per_day2(s->nurse_per_day,day+1);
+				//int x = verify_minimum_coverage1(nsp->coverage_matrix[day+1], minimum_coverage);
+				//free(minimum_coverage);
+
+				//if(x == 0){
+					int cons = verify_constraints(nsp, c, s, nurse1, d+1);
+					m_cost[nurse1][nurse2] += nsp->preference_matrix[nurse1][(d+1*n_shifts)+n2->data] + cons;
+					m_cost2[nurse1][nurse2] += nsp->preference_matrix[nurse1][(d+1*n_shifts)+n2->data] + cons;
+					m_assigment[nurse1][nurse2] = n2->data;
+				//}
+				//	if(d > 0){
+				//	printf("Day %d\n", d);
+				//	printList(list1);
+				//	printf("\n");
+				//}
+				//fim do calculo dos custos
 
 				if(d > 0)
 					p_n1->next = p_aux;
 				n1->next = aux;
 			}
-			break;
+			//break;
 		}
+		for (int i = 0; i < n_nurses; i++){
+			free(m_cost[i]);
+			free(m_cost2[i]);
+			free(m_assigment[i]);
+		}
+		free(m_cost);
+		free(m_cost2);
+		free(m_assigment);
 	}
 }
