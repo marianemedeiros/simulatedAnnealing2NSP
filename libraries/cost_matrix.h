@@ -36,7 +36,7 @@ typedef struct{
 * @param size1, is the size of nurse_per_day matrix.
 * @param size2, is the size of day_per_nurse matrix.
 */
-void show_multipartite_graph(Schedule* m);
+void show_multipartite_graph(Schedule* m, int x);
 
 /**
 * Verify number of assignments to a nurse. Check if this number it's between 

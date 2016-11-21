@@ -1,14 +1,16 @@
 #include "cost_matrix.h"
 
-void show_multipartite_graph(Schedule* m){
-	//for (int i = 0; i < n_days; i++){
-	//	printf("\nDay %d 	", i);
-	//	printList(m->day_per_nurse[i]);
-	//}
-
-	for (int i = 0; i < n_nurses; i++){
-		printf("\nNurse %d 	", i);
-		printList(m->nurse_per_day[i]);
+void show_multipartite_graph(Schedule* m, int x){
+	if(x == 1){
+		for (int i = 0; i < n_days; i++){
+			printf("\nDay %d 	", i);
+			printList(m->day_per_nurse[i]);
+		}
+	}else if(x == 0){
+		for (int i = 0; i < n_nurses; i++){
+			printf("\nNurse %d 	", i);
+			printList(m->nurse_per_day[i]);
+		}
 	}
 	printf("\n");
 }
