@@ -55,6 +55,12 @@ int* shifts_per_nurse(List** nurse_per_day){
 //day_per_nurse - nurse esta na coluna
 int cost_solution(Schedule* s, Constraints* c, NspLib* nsp){
 	int** minimum_coverage = shifts_per_day(s->day_per_nurse);
+	/*for (int i = 0; i < n_days; i++){
+		for (int j = 0; j < n_shifts; j++){
+			printf("%d ", minimum_coverage[i][j]);
+		}
+		printf("\n");
+	}*/
 	int** same_assignments = (int**) calloc(n_nurses, sizeof(int*));
 	int* shift_per_nurse = shifts_per_nurse(s->nurse_per_day);
 
@@ -93,7 +99,8 @@ int cost_solution(Schedule* s, Constraints* c, NspLib* nsp){
 
 			//if(nHCV != 0 || nSCV != 0)
 				cost = nsp->preference_matrix[index_n][(d*n_shifts)+nurse->data] + Ph * nHCV + Ps * nSCV;
-
+				s->h_violations+= nHCV;
+				s->s_violations+= nSCV;
 			index_n++;
 			nurse = nurse->next;
 		}
@@ -101,7 +108,7 @@ int cost_solution(Schedule* s, Constraints* c, NspLib* nsp){
 
 		//printf("day: %d; cost: %d (nHCV: %d; nSCV: %d)\n", d, cost, r, r1);
 	}
-	//printf("Total cost: %d\n", total_cost);
+	//printf("h_violations: %d, s_violations: %d\n", s->h_violations, s->s_violations);
 
 	for (int i = 0; i < n_nurses; ++i){
 		free(same_assignments[i]);
@@ -209,6 +216,9 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 		for (int i = 0; i < n_it; i++){
 			Schedule* s_line = copy_solution(current_s);
 			pcr(s_line, nsp, c);
+			prt(s_line,nsp,c);
+			pcr_backward(s_line,nsp,c);
+			prt_backward(s_line,nsp,c);
 			//s_line = generate_neighbor(s_line, PERMUTATIONS);
 			s_line->cost_solution = cost_solution(s_line, c, nsp);
 			int delta_custo = 0;
@@ -249,7 +259,9 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 	return best_s;
 }
 
-void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s, int initial_cost, double t){
+//saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt, m->cost_solution, executed);
+void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTemp, int it, double reduction, int vns, Schedule* s, 
+	int initial_cost, double t){
    FILE *fp;
 
    fp = fopen(name, "a+");
@@ -258,7 +270,7 @@ void saveDatas(char* name, char* name1, char* constraint, int temp, int finalTem
    	printf("nao abriu\n");
 
    //fprintf(fp, "Constraints File;Temperature;Final Temp;Iterations;Reduction Rate;VNS;K;Initial cost;Final Cost\n", constraint, temp, finalTemp, it, reduction, vns, K,initial_cost, s->cost_solution);
-   fprintf(fp, "%s,%s;%d;%d;%d;%f;%d;%d;%d;%d;%f\n", name1,constraint, temp, finalTemp, it, reduction, vns, K, initial_cost, s->cost_solution,t);
+   fprintf(fp, "%s,%s;%d;%d;%d;%f;%d;%d;%d;%d;%d,%d,%f\n", name1,constraint, temp, finalTemp, it, reduction, vns, K, initial_cost, s->cost_solution,s->h_violations, s->s_violations,t);
    	fclose(fp);
 }
 
@@ -337,28 +349,28 @@ int main(){
 	NspLib* nsp =  readNspFile("7290.nsp");
 
  	Schedule *m =  build_cost_matrix(nsp, c1);
- 	show_multipartite_graph(m,0);
-	m->cost_solution = cost_solution(m, c1, nsp);
-	prt(m,nsp,c1);
-
-	printf("cost: %d\n", m->cost_solution);
-	/*
+ 	m->cost_solution = cost_solution(m, c1, nsp);
+	//show_multipartite_graph(m,0);
+ 	/*
 	pcr(m,nsp,c1);
-	show_multipartite_graph(m);
+	prt(m,nsp,c1);
 	m->cost_solution = cost_solution(m, c1, nsp);
 	printf("pcr: %d\n", m->cost_solution);
+	show_multipartite_graph(m,1);
 	*/
-
-	/*
+	
+	
 	clock_t tic = clock();
 	Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);
 	clock_t toc = clock();
 
+	rt->cost_solution = cost_solution(rt, c1, nsp);
+	
 	double executed = (double)(toc - tic) / CLOCKS_PER_SEC;
 	printf("Time elapsed in simulated annealing: %f seconds\n", executed);
 
 	saveSchedule(saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution);
-	saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt,m->cost_solution, executed);
+	saveDatas(saveAt_2, saveAt, name1, temp,finalTemp,it,reduction,vns,rt, m->cost_solution, executed);
 
 	free_schedule(rt);
 	free_schedule(m);
@@ -373,5 +385,5 @@ int main(){
 
 	double executedT = (double)(tocT - ticT) / CLOCKS_PER_SEC;
 	printf("Elapsed All Program: %f seconds\n", executedT);
-	*/
+	
 }
