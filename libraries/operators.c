@@ -250,31 +250,23 @@ void prt(Schedule* s, NspLib* nsp, Constraints* c){
 }
 
 void pcr_backward(Schedule* s, NspLib* nsp, Constraints* c){
-	for (int i = 0; i < n_nurses; i++){
-		List* r = invertList(s->nurse_per_day[i]);
-		freeList(s->nurse_per_day[i]);
-		s->nurse_per_day[i] = r;
-	}	
+	for (int i = 0; i < n_nurses; i++)
+		invertList(s->nurse_per_day[i]);
+		
 	pcr(s,nsp,c);
 
-	for (int i = 0; i < n_nurses; i++){
-		List* r = invertList(s->nurse_per_day[i]);
-		freeList(s->nurse_per_day[i]);
-		s->nurse_per_day[i] = r;
-	}	
+	for (int i = 0; i < n_nurses; i++)
+		invertList(s->nurse_per_day[i]);
+		
 }
 
 void prt_backward(Schedule* s, NspLib* nsp, Constraints* c){
-	for (int i = 0; i < n_nurses; i++){
-		List* r = invertList(s->nurse_per_day[i]);
-		freeList(s->nurse_per_day[i]);
-		s->nurse_per_day[i] = r;
-	}	
+	for (int i = 0; i < n_nurses; i++)
+		invertList(s->nurse_per_day[i]);
+		
 	prt(s,nsp,c);
 
-	for (int i = 0; i < n_nurses; i++){
-		List* r = invertList(s->nurse_per_day[i]);
-		freeList(s->nurse_per_day[i]);
-		s->nurse_per_day[i] = r;
-	}	
+	for (int i = 0; i < n_nurses; i++)
+		invertList(s->nurse_per_day[i]);
+		
 }
