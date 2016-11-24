@@ -132,16 +132,16 @@ void pcr(Schedule* s, NspLib* nsp, Constraints* c){
 				n1->next = n2;
 
 				//calculos
-				int* minimum_coverage = shifts_per_day2(s->nurse_per_day,day+1);
-				int x = verify_minimum_coverage1(nsp->coverage_matrix[day+1], minimum_coverage);
-				free(minimum_coverage);
+				//int* minimum_coverage = shifts_per_day2(s->nurse_per_day,day+1);
+				//int x = verify_minimum_coverage1(nsp->coverage_matrix[day+1], minimum_coverage);
+				//free(minimum_coverage);
 
-				if(x == 0){
+				//if(x == 0){
 					int cons = verify_constraints(nsp, c, s, nurse1, day+1);
 					m_cost[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + cons;
 					m_cost2[nurse1][nurse2] += nsp->preference_matrix[nurse1][(day+1*n_shifts)+n2->data] + cons;
 					m_assigment[nurse1][nurse2] = n2->data;
-				}
+				//}
 				//final do calculo das constraints
 
 				n1->next = aux;
@@ -201,8 +201,8 @@ void prt(Schedule* s, NspLib* nsp, Constraints* c){
 				}
 
 				//calcula custos
-				//int* minimum_coverage = shifts_per_day2(s->nurse_per_day,day+1);
-				//int x = verify_minimum_coverage1(nsp->coverage_matrix[day+1], minimum_coverage);
+				//int* minimum_coverage = shifts_per_day2(s->nurse_per_day,d+1);
+				//int x = verify_minimum_coverage1(nsp->coverage_matrix[d+1], minimum_coverage);
 				//free(minimum_coverage);
 
 				//if(x == 0){
@@ -224,6 +224,20 @@ void prt(Schedule* s, NspLib* nsp, Constraints* c){
 			}
 			//break;
 		}
+
+		//hungaro
+		//hungarian algorithm
+		hungarian_problem_t *p = (hungarian_problem_t*) calloc(1,sizeof(hungarian_problem_t));
+
+		hungarian_init(p, m_cost2 , n_nurses,n_nurses, HUNGARIAN_MODE_MINIMIZE_COST) ;
+		hungarian_solve(p);
+		//hungarian_print_assignment_vector(p->assignment_vector,n_nurses,d);
+
+		recombine_schedule(m_assigment, p->assignment_vector, s,d+1);
+
+		hungarian_free(p);
+
+
 		for (int i = 0; i < n_nurses; i++){
 			free(m_cost[i]);
 			free(m_cost2[i]);
@@ -233,4 +247,34 @@ void prt(Schedule* s, NspLib* nsp, Constraints* c){
 		free(m_cost2);
 		free(m_assigment);
 	}
+}
+
+void pcr_backward(Schedule* s, NspLib* nsp, Constraints* c){
+	for (int i = 0; i < n_nurses; i++){
+		List* r = invertList(s->nurse_per_day[i]);
+		freeList(s->nurse_per_day[i]);
+		s->nurse_per_day[i] = r;
+	}	
+	pcr(s,nsp,c);
+
+	for (int i = 0; i < n_nurses; i++){
+		List* r = invertList(s->nurse_per_day[i]);
+		freeList(s->nurse_per_day[i]);
+		s->nurse_per_day[i] = r;
+	}	
+}
+
+void prt_backward(Schedule* s, NspLib* nsp, Constraints* c){
+	for (int i = 0; i < n_nurses; i++){
+		List* r = invertList(s->nurse_per_day[i]);
+		freeList(s->nurse_per_day[i]);
+		s->nurse_per_day[i] = r;
+	}	
+	prt(s,nsp,c);
+
+	for (int i = 0; i < n_nurses; i++){
+		List* r = invertList(s->nurse_per_day[i]);
+		freeList(s->nurse_per_day[i]);
+		s->nurse_per_day[i] = r;
+	}	
 }

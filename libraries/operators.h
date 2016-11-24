@@ -14,3 +14,5 @@ int verify_minimum_coverage1(int* coverage_matrix, int* minimum_coverage);
 void recombine_schedule(int** m_assigment, int* assignment_vector, Schedule* s, int day);
 void pcr(Schedule* s, NspLib* nsp, Constraints* c);
 void prt(Schedule* s, NspLib* nsp, Constraints* c);
+void pcr_backward(Schedule* s, NspLib* nsp, Constraints* c);
+void prt_backward(Schedule* s, NspLib* nsp, Constraints* c);
