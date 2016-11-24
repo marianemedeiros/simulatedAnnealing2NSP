@@ -390,3 +390,13 @@ void freeList(List* list){
 	free(prev);
 	free(node);
 }
+
+List* invertList(List* list){
+	List* rt = (List*) calloc(1, sizeof(List));
+
+	for (int i = list->size-1; i >= 0 ; i--){
+		int x = getElementByIndex(list,i);
+		addLastList(rt, x);
+	}
+	return rt;
+}
