@@ -391,12 +391,18 @@ void freeList(List* list){
 	free(node);
 }
 
-List* invertList(List* list){
-	List* rt = (List*) calloc(1, sizeof(List));
-
+void invertList(List* list){
+	int j = 0;
 	for (int i = list->size-1; i >= 0 ; i--){
-		int x = getElementByIndex(list,i);
-		addLastList(rt, x);
+		if(i != j){
+			int x = getElementByIndex(list,i);
+			int y = getElementByIndex(list,j);
+			
+			//addLastList(rt, x);
+			setList(list, x, i);
+			setList(list, y, j);
+
+			j++;
+		}
 	}
-	return rt;
 }
