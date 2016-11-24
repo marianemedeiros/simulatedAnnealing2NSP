@@ -28,6 +28,8 @@ typedef struct{
 	List** nurse_per_day;
 	List** day_per_nurse;
 	int cost_solution;
+	int h_violations;
+	int s_violations;
 }Schedule;
 
 /**
