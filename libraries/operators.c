@@ -257,6 +257,9 @@ void pcr_backward(Schedule* s, NspLib* nsp, Constraints* c){
 
 	for (int i = 0; i < n_nurses; i++)
 		invertList(s->nurse_per_day[i]);
+
+	for (int i = 0; i < n_days; i++)
+		invertList(s->day_per_nurse[i]);
 		
 }
 
@@ -268,5 +271,8 @@ void prt_backward(Schedule* s, NspLib* nsp, Constraints* c){
 
 	for (int i = 0; i < n_nurses; i++)
 		invertList(s->nurse_per_day[i]);
+	
+	for (int i = 0; i < n_days; i++)
+		invertList(s->day_per_nurse[i]);
 		
 }
