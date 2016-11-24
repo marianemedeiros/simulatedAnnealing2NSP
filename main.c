@@ -351,14 +351,22 @@ int main(){
  	Schedule *m =  build_cost_matrix(nsp, c1);
  	m->cost_solution = cost_solution(m, c1, nsp);
 	//show_multipartite_graph(m,0);
+ 	
  	/*
 	pcr(m,nsp,c1);
 	prt(m,nsp,c1);
+	pcr_backward(m,nsp,c1);
+	prt_backward(m,nsp,c1);
+
 	m->cost_solution = cost_solution(m, c1, nsp);
 	printf("pcr: %d\n", m->cost_solution);
 	show_multipartite_graph(m,1);
-	*/
 	
+	free_schedule(m);
+	freeNsp(nsp);
+	freeConstraints(c1);
+	*/
+
 	
 	clock_t tic = clock();
 	Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);
