@@ -187,12 +187,16 @@ Schedule* vnd(Schedule* s, int neighbor_struct, Constraints* c, NspLib* nsp){
 	int k = 1;
 
 	while(k <= neighbor_struct){
-		pcr(s_2line, nsp, c);
-		//s_2line = generate_neighbor(s_2line, PERMUTATIONS);
+		if(k == 1)
+			prt(s_2line, nsp, c);
+		if(k == 2)
+			pcr_backward(s_2line, nsp, c);
+		if(k == 3)
+			prt_backward(s_2line, nsp, c);
+
 		s_2line->cost_solution = cost_solution(s_2line, c, nsp);
 
 		if(s_2line->cost_solution < s_line->cost_solution){
-			aux = 1;
 			free_schedule(s_line);
 			s_line = (Schedule*) calloc(1, sizeof(Schedule));
 			s_line = s_2line;
@@ -200,10 +204,6 @@ Schedule* vnd(Schedule* s, int neighbor_struct, Constraints* c, NspLib* nsp){
 		}else
 			k++;
 	}
-
-	if(aux == 0)
-		free_schedule(s_2line);
-
 	return s_line;
 }
 
@@ -216,9 +216,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 		for (int i = 0; i < n_it; i++){
 			Schedule* s_line = copy_solution(current_s);
 			pcr(s_line, nsp, c);
-			prt(s_line,nsp,c);
-			pcr_backward(s_line,nsp,c);
-			prt_backward(s_line,nsp,c);
+			
 			//s_line = generate_neighbor(s_line, PERMUTATIONS);
 			s_line->cost_solution = cost_solution(s_line, c, nsp);
 			int delta_custo = 0;
@@ -226,6 +224,15 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 
 			if(use_vnd == 1){
 				Schedule* s_2line = vnd(s_line, K ,c,nsp);
+				/*int x = 0;	
+				while(x <= 2){
+					pcr(s_line, nsp, c);
+					prt(s_line,nsp,c);
+					pcr_backward(s_line,nsp,c);
+					prt_backward(s_line,nsp,c);
+					x++;
+				}
+				*/
 				delta_custo = s_2line->cost_solution - current_s->cost_solution;
 				free_schedule(s_2line);
 			}else{
@@ -244,7 +251,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 				free_schedule(best_s);
 				//best_s = (Schedule*) calloc(1, sizeof(Schedule));
 				best_s = copy_solution(current_s);
-
+				printf("aaa\n");
 				printf("-- Cost: %d (it: %d, t: %d)\n", best_s->cost_solution, i, t);
 
 					//show_multipartite_graph(best_s);
@@ -256,6 +263,7 @@ Schedule* simulated_annealing(Schedule* initial_s, int t0, int tf, int n_it, dou
 		t = ro * t; // fator de redução.
 	}
 	free_schedule(current_s);
+	printf("aaaqqq\n");
 	return best_s;
 }
 

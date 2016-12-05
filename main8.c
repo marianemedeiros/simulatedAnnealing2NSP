@@ -361,7 +361,7 @@ int main(){
 			Schedule* rt = simulated_annealing(m,temp,finalTemp,it,reduction,vns, c1, nsp);
 			clock_t toc = clock();
 
-			rt->cost_solution = cost_solution(rt, c1, nsp);
+			//rt->cost_solution = cost_solution(rt, c1, nsp);
 			
 			double executed = (double)(toc - tic) / CLOCKS_PER_SEC;
 			printf("Time elapsed in simulated annealing: %f seconds\n", executed);	
