@@ -15,7 +15,7 @@ clean:
 	@echo "Cleaning up.."
 	rm -rf *.o
 	rm -rf libraries/*.o
-	rm all
+	rm main
 
 #go: libraries/dinamicList.c libraries/strings.c libraries/nspLib.c libraries/hungarian/hungarian.c main.c
 #	g++ -o main libraries/dinamicList.c libraries/strings.c libraries/nspLib.c libraries/hungarian/hungarian.c main.c
