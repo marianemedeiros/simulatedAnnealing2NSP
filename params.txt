@@ -2,6 +2,6 @@
 1:finalTemp
 100:it
 0.98:reduction
-0:vns
-10:K
+1:vns
+3:K
 5:PERMUTATIONS
